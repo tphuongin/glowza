@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:name="logoGroup"
+        android:pivotX="22.5"  android:pivotY="24"
+        android:translateX="31.5" android:translateY="30">  <path
+        android:fillColor="#33BE93DA"
+        android:pathData="M25,2c-12.683,0 -23,10.318 -23,23c0,12.682 10.317,23 23,23c0.553,0 1,-0.448 1,-1v-8c0,-0.552 -0.447,-1 -1,-1c-7.168,0 -13,-5.832 -13,-13c0,-7.168 5.832,-13 13,-13c0.553,0 1,-0.448 1,-1v-8c0,-0.552 -0.447,-1 -1,-1zM25,20c-0.553,0 -1,0.448 -1,1v9c0,0.552 0.447,1 1,1h10v10c0,0.552 0.447,1 1,1h9c0.553,0 1,-0.448 1,-1v-20c0,-0.552 -0.447,-1 -1,-1z" />
+
+        <path
+            android:name="logoPath"
+            android:fillColor="#BE93DA"
+            android:pathData="M25,2c-12.683,0 -23,10.318 -23,23c0,12.682 10.317,23 23,23c0.553,0 1,-0.448 1,-1v-8c0,-0.552 -0.447,-1 -1,-1c-7.168,0 -13,-5.832 -13,-13c0,-7.168 5.832,-13 13,-13c0.553,0 1,-0.448 1,-1v-8c0,-0.552 -0.447,-1 -1,-1zM25,20c-0.553,0 -1,0.448 -1,1v9c0,0.552 0.447,1 1,1h10v10c0,0.552 0.447,1 1,1h9c0.553,0 1,-0.448 1,-1v-20c0,-0.552 -0.447,-1 -1,-1z" />
+    </group>
+
+</vector>

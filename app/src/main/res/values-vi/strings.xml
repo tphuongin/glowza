@@ -2,12 +2,12 @@
     <string name="app_name">Glowza</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="exit_application">Exit</string>
-    <string name="title_camera_permission">Allow Glowza to access your camera</string>
-    <string name="description_camera_permission">Allow access to take photos and experience our features. You can change this anytime in the app settings.</string>
-    <string name="go_to_setting">Go to Settings</string>
+    <string name="exit_application">Thoát</string>
+    <string name="title_camera_permission">Cho phép Glowza truy cập máy ảnh</string>
+    <string name="description_camera_permission">Bạn có thể chụp ảnh và trải nghiệm các tính năng. Bạn có thể thay đổi lựa chọn này bất cứ lúc nào trong phần cài đặt.</string>
+    <string name="go_to_setting">Đi tới Cài đặt</string>
     <string name="title_gallery_permission">Cho phép Glowza truy cập ảnh của bạn</string>
     <string name="description_gallery_permission">Truy cập thư viện để chọn và chỉnh sửa hình ảnh của bạn. Bạn có thể thay đổi quyền này bất cứ lúc nào trong phần cài đặt.</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">Hủy</string>
 
 </resources>

@@ -19,8 +19,8 @@
     <color name="onTertiaryContainer">#B2F7FF</color>
 
     <!-- ===== BACKGROUND ===== -->
-    <color name="background">#000000</color>
-    <color name="onBackground">#FFFFFF</color>
+    <color name="background">#FFFFFF</color>
+    <color name="onBackground">#000000</color>
 
     <!-- ===== SURFACE ===== -->
     <color name="surface">#121212</color>
