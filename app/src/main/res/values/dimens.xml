@@ -4,6 +4,7 @@
     <dimen name="dialog_margin_top_large">32dp</dimen>
     <dimen name="dialog_margin_top_small">12dp</dimen>
     <dimen name="button_side_margin">8dp</dimen>
+    <dimen name="button_side_padding">8dp</dimen>
 
     <dimen name="title_text">20sp</dimen>
     <dimen name="content_text">16sp</dimen>
