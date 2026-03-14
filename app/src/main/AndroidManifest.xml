@@ -8,6 +8,7 @@
         android:maxSdkVersion="28" />
 
     <application
+        android:name=".GlowzaApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,6 +19,8 @@
         android:theme="@style/Theme.Glowza">
         <activity
             android:name=".ui.camera.CameraActivity"
+            android:screenOrientation="fullSensor"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

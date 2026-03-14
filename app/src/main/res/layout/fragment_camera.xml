@@ -6,11 +6,66 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.camera.fragment.CameraFragment">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/preview_view"
+    <View
+        android:id="@+id/view_top_letterbox"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/onSurface"/>
+        android:layout_height="0dp"
+        android:background="#B0000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/frame_camera_preview" />
+
+    <View
+        android:id="@+id/view_bottom_letterbox"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#B0000000"
+        app:layout_constraintTop_toBottomOf="@id/frame_camera_preview"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/frame_camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintDimensionRatio="9:16"
+        app:layout_constraintTop_toBottomOf="@id/view_top_letterbox"
+        app:layout_constraintBottom_toTopOf="@id/view_bottom_letterbox">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:scaleType="fillCenter" />
+
+        <com.sgroupmobile.glowza.view.CameraOverlayView
+            android:id="@+id/overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/btn_zoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_zoom_button"
+        android:src="@drawable/zoom_in"
+        app:layout_constraintBottom_toTopOf="@id/btn_snap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/normal_bottom_margin"/>
+
+    <TextView
+        android:id="@+id/tv_countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="@color/primary"
+        android:textSize="@dimen/big_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textStyle="bold"/>
 
     <ImageButton
         android:id="@+id/btn_exit"
@@ -64,7 +119,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:paddingBottom="@dimen/normal_padding"
+        android:layout_marginBottom="@dimen/snap_margin_bottom"
         android:src="@drawable/snap"
         android:background="@android:color/transparent"/>
 
@@ -74,7 +129,6 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/btn_snap"
         android:src="@drawable/face_filter"
-        android:paddingBottom="@dimen/normal_padding"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_snap"
         app:layout_constraintEnd_toStartOf="@id/btn_snap"
@@ -86,11 +140,17 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/btn_snap"
         app:layout_constraintBottom_toBottomOf="@id/btn_snap"
-        android:paddingBottom="@dimen/normal_padding"
         android:src="@drawable/image_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/btn_snap"
         android:background="@android:color/transparent"/>
 
+    <View
+        android:id="@+id/view_flash_effect"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:alpha="0"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

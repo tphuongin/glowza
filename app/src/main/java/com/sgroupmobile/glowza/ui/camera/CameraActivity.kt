@@ -1,24 +1,24 @@
 package com.sgroupmobile.glowza.ui.camera
 
 import android.Manifest
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
 import com.sgroupmobile.glowza.databinding.ActivityCameraBinding
 import com.sgroupmobile.glowza.helper.PermissionHelper
 import com.sgroupmobile.glowza.ui.camera.fragment.CameraFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CameraActivity : BaseActivity<ActivityCameraBinding>() {
     override fun provideBinding(): ActivityCameraBinding = ActivityCameraBinding.inflate(layoutInflater)
     private val permissionHelper = PermissionHelper(this)
 
     override fun setupUI() {
+        requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         checkPermission()
     }
 
     override fun setupInset() {}
-
     private fun checkPermission() {
         permissionHelper.requestPermission(
             Manifest.permission.CAMERA,
