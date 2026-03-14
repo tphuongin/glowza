@@ -15,6 +15,7 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.12.4"
 constraintlayout = "2.2.1"
+playServicesMlkitFaceDetection = "17.1.0"
 
 [libraries]
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCamera2" }
@@ -36,6 +37,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+play-services-mlkit-face-detection = { module = "com.google.android.gms:play-services-mlkit-face-detection", version.ref = "playServicesMlkitFaceDetection" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

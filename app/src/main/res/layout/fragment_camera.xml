@@ -49,10 +49,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_zoom_button"
         android:src="@drawable/zoom_in"
-        app:layout_constraintBottom_toTopOf="@id/btn_snap"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="@dimen/normal_bottom_margin"/>
+        app:layout_constraintTop_toTopOf="@id/frame_camera_preview"
+        android:layout_margin="@dimen/normal_bottom_margin"/>
 
     <TextView
         android:id="@+id/tv_countdown"
@@ -122,6 +121,22 @@
         android:layout_marginBottom="@dimen/snap_margin_bottom"
         android:src="@drawable/snap"
         android:background="@android:color/transparent"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_filters"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:clipToPadding="false"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/btn_snap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_filter_container" />
 
     <ImageButton
         android:id="@+id/btn_face_filter"

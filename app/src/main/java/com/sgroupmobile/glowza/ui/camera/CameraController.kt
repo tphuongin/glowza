@@ -4,10 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.util.Rational
-import android.view.GestureDetector
 import android.view.OrientationEventListener
 import android.view.Surface
-import android.view.View
+import androidx.annotation.OptIn
 import androidx.camera.core.*
 import androidx.camera.core.ViewPort.FILL_CENTER
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -15,8 +14,11 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.sgroupmobile.glowza.common.enum.CameraRatio
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class CameraController @Inject constructor(
@@ -28,6 +30,14 @@ class CameraController @Inject constructor(
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
+    private val faceDetector by lazy {
+        val options = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+            .build()
+        FaceDetection.getClient(options)
+    }
+    private var imageAnalyzer: ImageAnalysis? = null
     private val orientationEventListener by lazy {
         object : OrientationEventListener(context) {
             override fun onOrientationChanged(orientation: Int) {
@@ -54,7 +64,7 @@ class CameraController @Inject constructor(
 
             lifecycleOwner.lifecycleScope.launch {
                 viewModel.cameraFacing.collect { selector ->
-                    bindUseCases(selector)
+                    bindUseCases(selector, viewModel.isFaceFilterOn.value)
                 }
             }
             lifecycleOwner.lifecycleScope.launch {
@@ -62,18 +72,17 @@ class CameraController @Inject constructor(
                     imageCapture?.flashMode = if(isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
                 }
             }
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.isFaceFilterOn.collect { isOn ->
+                    bindUseCases(viewModel.cameraFacing.value, isOn)
+                }
+            }
 
         }, ContextCompat.getMainExecutor(context))
     }
-    fun bindUseCases(selector: CameraSelector) {
+    fun bindUseCases(selector: CameraSelector, isFilterOn: Boolean) {
         val provider = cameraProvider ?: return
         provider.unbindAll()
-
-        val screenAspectRatio = Rational(previewView.width, previewView.height)
-
-        val viewPort = ViewPort.Builder(screenAspectRatio, previewView.display.rotation)
-            .setScaleType(FILL_CENTER)
-            .build()
 
         val preview = Preview.Builder().build().also {
             it.surfaceProvider = previewView.surfaceProvider
@@ -84,25 +93,70 @@ class CameraController @Inject constructor(
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .build()
 
-        val useCaseGroup = UseCaseGroup.Builder()
+        val useCaseGroupBuilder = UseCaseGroup.Builder()
             .addUseCase(preview)
             .addUseCase(imageCapture!!)
-            .setViewPort(viewPort)
+
+        if (isFilterOn) {
+            imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetRotation(previewView.display.rotation)
+                .build()
+                .also {
+                    it.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
+                        processImageProxy(imageProxy)
+                    }
+                }
+            useCaseGroupBuilder.addUseCase(imageAnalyzer!!)
+        } else {
+            viewModel.updateFaces(emptyList(), 0, 0)
+        }
+
+        val screenAspectRatio = Rational(previewView.width, previewView.height)
+        val viewPort = ViewPort.Builder(screenAspectRatio, previewView.display.rotation)
+            .setScaleType(FILL_CENTER)
             .build()
+        useCaseGroupBuilder.setViewPort(viewPort)
 
         try {
             camera = provider.bindToLifecycle(
                 lifecycleOwner,
                 selector,
-                useCaseGroup
+                useCaseGroupBuilder.build()
             )
         } catch (e: Exception) {
             Log.e("CameraController", "Binding failed", e)
         }
     }
 
+    @OptIn(ExperimentalGetImage::class)
+    private fun processImageProxy(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image
+        if (mediaImage != null) {
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+            faceDetector.process(image)
+                .addOnSuccessListener { faces ->
+                    // Tính toán kích thước frame để Overlay vẽ chính xác
+                    val isRotated = imageProxy.imageInfo.rotationDegrees % 180 != 0
+                    val width = if (isRotated) imageProxy.height else imageProxy.width
+                    val height = if (isRotated) imageProxy.width else imageProxy.height
+
+                    viewModel.updateFaces(faces, width, height)
+                }
+                .addOnFailureListener { e ->
+                    Log.e("MLKit", "Face detection failed", e)
+                }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                }
+        } else {
+            imageProxy.close()
+        }
+    }
     fun stop() {
         orientationEventListener.disable()
+        faceDetector.close()
         camera = null
     }
 
