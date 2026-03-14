@@ -10,7 +10,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceLandmark
-import com.sgroupmobile.glowza.data.model.FaceFilter
+import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.common.enum.FilterType
 
 class CameraOverlayView(context: Context, attr: AttributeSet): View(context, attr) {
@@ -21,7 +21,7 @@ class CameraOverlayView(context: Context, attr: AttributeSet): View(context, att
     var isFrontCamera = true
 
     private var filterDrawable: Drawable? = null
-    private var selectedFilter: FaceFilter? = null
+    private var selectedFilter: AppFilter? = null
 
     private val gridPaint = Paint().apply {
         color = Color.WHITE
@@ -29,7 +29,7 @@ class CameraOverlayView(context: Context, attr: AttributeSet): View(context, att
         strokeWidth = 1f
     }
 
-    fun setFilter(filter: FaceFilter?) {
+    fun setFilter(filter: AppFilter?) {
         selectedFilter = filter
         filterDrawable = if (filter != null && filter.filterRes != -1) {
             ContextCompat.getDrawable(context, filter.filterRes)

@@ -7,16 +7,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.sgroupmobile.glowza.R
-import com.sgroupmobile.glowza.data.model.FaceFilter
+import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.databinding.ItemFilterBinding
 
-class FilterAdapter(private val onFilterClicked: (FaceFilter) -> Unit) :
-    ListAdapter<FaceFilter, FilterAdapter.ViewHolder>(DiffCallback()) {
+class FilterAdapter(private val onFilterClicked: (AppFilter) -> Unit) :
+    ListAdapter<AppFilter, FilterAdapter.ViewHolder>(DiffCallback()) {
 
     private var selectedPosition = 0
 
+    fun resetSelection() {
+        val oldPos = selectedPosition
+        selectedPosition = 0
+        notifyItemChanged(oldPos)
+        notifyItemChanged(selectedPosition)
+    }
+
     inner class ViewHolder(private val binding: ItemFilterBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(filter: FaceFilter, isSelected: Boolean) {
+        fun bind(filter: AppFilter, isSelected: Boolean) {
             binding.imgFilterPreview.setImageResource(filter.previewIcon)
 
             binding.imgFilterPreview.setBackgroundResource(
@@ -42,6 +49,7 @@ class FilterAdapter(private val onFilterClicked: (FaceFilter) -> Unit) :
 
                 notifyItemChanged(oldPos)
                 notifyItemChanged(selectedPosition)
+
                 onFilterClicked(filter)
             }
         }
@@ -56,8 +64,8 @@ class FilterAdapter(private val onFilterClicked: (FaceFilter) -> Unit) :
         holder.bind(getItem(position), position == selectedPosition)
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<FaceFilter>() {
-        override fun areItemsTheSame(oldItem: FaceFilter, newItem: FaceFilter) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: FaceFilter, newItem: FaceFilter) = oldItem == newItem
+    class DiffCallback : DiffUtil.ItemCallback<AppFilter>() {
+        override fun areItemsTheSame(oldItem: AppFilter, newItem: AppFilter) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: AppFilter, newItem: AppFilter) = oldItem == newItem
     }
 }

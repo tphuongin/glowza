@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gpuimage)
     implementation(libs.play.services.mlkit.face.detection)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)

@@ -37,4 +37,6 @@
     <color name="errorContainer">#410002</color>
     <color name="onErrorContainer">#FFDAD6</color>
 
+    <color name="white">#FFFFFF</color>
+
 </resources>
