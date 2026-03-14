@@ -1,32 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="primary">#FF75BC</color>
-    <color name="onPrimary">#3A0022</color>
-    <color name="primaryContainer">#FF4DA6</color>
-    <color name="onPrimaryContainer">#FFFFFF</color>
+    <!-- ===== PRIMARY ===== -->
+    <color name="primary">#E6B4DA</color>
+    <color name="onPrimary">#4A1F45</color>
+    <color name="primaryContainer">#63305E</color>
+    <color name="onPrimaryContainer">#F3D7EC</color>
 
-    <color name="secondary">#BB86FC</color>
-    <color name="onSecondary">#2B0E40</color>
-    <color name="secondaryContainer">#B266FF</color>
-    <color name="onSecondaryContainer">#FFFFFF</color>
+    <!-- ===== SECONDARY ===== -->
+    <color name="secondary">#8FD3C7</color>
+    <color name="onSecondary">#003731</color>
+    <color name="secondaryContainer">#1E4E49</color>
+    <color name="onSecondaryContainer">#D6F3EE</color>
 
-    <color name="tertiary">#00E5FF</color>
-    <color name="onTertiary">#00363D</color>
-    <color name="tertiaryContainer">#004F58</color>
-    <color name="onTertiaryContainer">#B2F7FF</color>
+    <!-- ===== TERTIARY ===== -->
+    <color name="tertiary">#F2A97E</color>
+    <color name="onTertiary">#4A1F00</color>
+    <color name="tertiaryContainer">#5B2E14</color>
+    <color name="onTertiaryContainer">#FFDCC8</color>
 
-    <color name="background">#000000</color>
-    <color name="onBackground">#FFFFFF</color>
+    <!-- ===== BACKGROUND ===== -->
+    <color name="background">#121212</color>
+    <color name="onBackground">#EAE0E8</color>
 
+    <!-- ===== SURFACE ===== -->
     <color name="surface">#121212</color>
-    <color name="onSurface">#E1E1E1</color>
-    <color name="surfaceVariant">#252525</color>
-    <color name="onSurfaceVariant">#CACACA</color>
+    <color name="onSurface">#EAE0E8</color>
+    <color name="surfaceVariant">#4F444B</color>
+    <color name="onSurfaceVariant">#D3C2CC</color>
 
-    <color name="outline">#3F3F3F</color>
+    <!-- ===== OUTLINE / DIVIDER ===== -->
+    <color name="outline">#93878E</color>
 
-    <color name="error">#FFB4AB</color>
+    <!-- ===== ERROR ===== -->
+    <color name="error">#FF6B6B</color>
     <color name="onError">#690005</color>
     <color name="errorContainer">#93000A</color>
     <color name="onErrorContainer">#FFDAD6</color>

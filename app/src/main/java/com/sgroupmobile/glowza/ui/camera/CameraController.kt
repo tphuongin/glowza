@@ -1,0 +1,248 @@
+package com.sgroupmobile.glowza.ui.camera
+
+import android.content.Context
+import android.graphics.*
+import android.net.Uri
+import android.util.Log
+import android.util.Rational
+import android.view.OrientationEventListener
+import android.view.Surface
+import androidx.camera.core.Camera
+import androidx.annotation.OptIn
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
+import androidx.camera.core.ViewPort.FILL_CENTER
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.sgroupmobile.glowza.data.model.AppFilter
+import com.sgroupmobile.glowza.helper.ImageFilterManager
+import jp.co.cyberagent.android.gpuimage.GPUImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.concurrent.Executors
+import javax.inject.Inject
+
+class CameraController @Inject constructor(
+    private val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
+    private val previewView: PreviewView,
+    private val viewModel: CameraViewModel
+) {
+    private var cameraProvider: ProcessCameraProvider? = null
+    private var imageCapture: ImageCapture? = null
+    private var camera: Camera? = null
+
+    private val faceDetector by lazy {
+        val options = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+            .build()
+        FaceDetection.getClient(options)
+    }
+
+    private val orientationEventListener by lazy {
+        object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) return
+                val rotation = when (orientation) {
+                    in 45..134 -> Surface.ROTATION_270
+                    in 135..224 -> Surface.ROTATION_180
+                    in 225..314 -> Surface.ROTATION_90
+                    else -> Surface.ROTATION_0
+                }
+                imageCapture?.targetRotation = rotation
+            }
+        }
+    }
+
+    fun start() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        orientationEventListener.enable()
+        cameraProviderFuture.addListener({
+            cameraProvider = cameraProviderFuture.get()
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.cameraFacing.collect { selector ->
+                    bindUseCases(selector, viewModel.isFaceFilterOn.value)
+                }
+            }
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.flash.collect { isFlashOn ->
+                    imageCapture?.flashMode = if(isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
+                }
+            }
+            lifecycleOwner.lifecycleScope.launch {
+                viewModel.isFaceFilterOn.collect { isOn ->
+                    bindUseCases(viewModel.cameraFacing.value, isOn)
+                }
+            }
+        }, ContextCompat.getMainExecutor(context))
+    }
+
+    fun bindUseCases(selector: CameraSelector, isFilterOn: Boolean) {
+        val provider = cameraProvider ?: return
+        provider.unbindAll()
+
+        val preview = Preview.Builder().build().also {
+            it.surfaceProvider = previewView.surfaceProvider
+        }
+
+        imageCapture = ImageCapture.Builder()
+            .setTargetRotation(previewView.display.rotation)
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+
+        val useCaseGroupBuilder = UseCaseGroup.Builder()
+            .addUseCase(preview)
+            .addUseCase(imageCapture!!)
+
+        if (isFilterOn) {
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetRotation(previewView.display.rotation)
+                .build()
+                .also {
+                    it.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
+                        processImageProxy(imageProxy)
+                    }
+                }
+            useCaseGroupBuilder.addUseCase(imageAnalyzer)
+        } else {
+            viewModel.updateFaces(emptyList(), 0, 0)
+        }
+
+        val screenAspectRatio = Rational(previewView.width, previewView.height)
+        val viewPort = ViewPort.Builder(screenAspectRatio, previewView.display.rotation)
+            .setScaleType(FILL_CENTER)
+            .build()
+        useCaseGroupBuilder.setViewPort(viewPort)
+
+        try {
+            camera = provider.bindToLifecycle(lifecycleOwner, selector, useCaseGroupBuilder.build()) as Camera?
+        } catch (e: Exception) {
+            Log.e("CameraController", "Binding failed", e)
+        }
+    }
+
+    @OptIn(ExperimentalGetImage::class)
+    private fun processImageProxy(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image ?: return imageProxy.close()
+        val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+        faceDetector.process(image)
+            .addOnSuccessListener { faces ->
+                val isRotated = imageProxy.imageInfo.rotationDegrees % 180 != 0
+                val width = if (isRotated) imageProxy.height else imageProxy.width
+                val height = if (isRotated) imageProxy.width else imageProxy.height
+                viewModel.updateFaces(faces, width, height)
+            }
+            .addOnCompleteListener { imageProxy.close() }
+    }
+
+    fun takePhoto(onImageCaptured: (Uri) -> Unit) {
+        val imageCapture = imageCapture ?: return
+        val photoFile = File(context.cacheDir, "temp_photo_${System.currentTimeMillis()}.jpg")
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                        // Load ảnh gốc
+                        var bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        val isFrontCamera = viewModel.cameraFacing.value == CameraSelector.DEFAULT_FRONT_CAMERA
+
+                        // Lật ảnh nếu là camera trước (Selfie)
+                        if (isFrontCamera) {
+                            bitmap = flipBitmap(bitmap)
+                        }
+
+                        // Áp dụng Image Filter (GPUImage)
+                        val colorCode = viewModel.selectedColorFilter.value
+                        if (colorCode.isNotEmpty()) {
+                            bitmap = applyGPUFilter(bitmap, colorCode)
+                        }
+
+                        // Áp dụng Face Filter (Overlay)
+                        val selectedFace = viewModel.selectedFaceFilter.value
+                        val detectedFaces = viewModel.faces.value
+                        if (selectedFace != null && detectedFaces.isNotEmpty()) {
+                            bitmap = mergeFaceFilterToBitmap(bitmap, selectedFace, detectedFaces)
+                        }
+
+                        // Lưu đè lại file
+                        saveBitmapToFile(bitmap, photoFile)
+                        bitmap.recycle()
+
+                        withContext(Dispatchers.Main) {
+                            onImageCaptured(Uri.fromFile(photoFile))
+                        }
+                    }
+                }
+                override fun onError(e: ImageCaptureException) { Log.e("Camera", "Failed", e) }
+            }
+        )
+    }
+
+    private fun applyGPUFilter(bitmap: Bitmap, code: String): Bitmap {
+        val gpuImage = GPUImage(context)
+        gpuImage.setFilter(ImageFilterManager.getGPUFilter(code))
+        return gpuImage.getBitmapWithFilterApplied(bitmap)
+    }
+
+    private fun mergeFaceFilterToBitmap(original: Bitmap, filter: AppFilter, faces: List<Face>): Bitmap {
+        val result = original.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(result)
+
+        FilterPainter.drawFiltersOnCanvas(
+            canvas, original.width, original.height,
+            viewModel.imageSourceWidth, viewModel.imageSourceHeight,
+            faces, filter, context,
+            isFrontCamera = true
+        )
+
+        return result
+    }
+
+    private fun flipBitmap(source: Bitmap): Bitmap {
+        val matrix = Matrix().apply { postScale(-1f, 1f) }
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    private fun saveBitmapToFile(bitmap: Bitmap, file: File) {
+        FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
+    }
+
+    fun stop() {
+        orientationEventListener.disable()
+        faceDetector.close()
+        camera = null
+    }
+
+    fun setZoomRatio(value: Float) {
+        val zoomState = getZoomState()?.value
+        camera?.cameraControl?.setZoomRatio(value.coerceIn(zoomState?.minZoomRatio ?: 1f, zoomState?.maxZoomRatio ?: 10f))
+    }
+
+    fun getZoomState() = camera?.cameraInfo?.zoomState
+    fun toggleFlash() = viewModel.toggleFlash()
+    fun switchCamera() = viewModel.switchCamera()
+}
