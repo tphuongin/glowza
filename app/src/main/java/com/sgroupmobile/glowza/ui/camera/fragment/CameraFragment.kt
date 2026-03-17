@@ -21,6 +21,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
+import com.sgroupmobile.glowza.common.enum.CameraTimer
+import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.databinding.FragmentCameraBinding
 import com.sgroupmobile.glowza.helper.FilterHelper
 import com.sgroupmobile.glowza.helper.ImageFilterManager
@@ -40,6 +42,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     private lateinit var filterAdapter: FilterAdapter
     private lateinit var filterHelper: FilterHelper
     private lateinit var scaleGestureDetector: ScaleGestureDetector
+    private var hideRunnable: Runnable? = null
 
     override fun provideBinding(
         inflater: LayoutInflater,
@@ -81,8 +84,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
         binding.rvFilters.adapter = filterAdapter
 
-        // Mặc định nạp dữ liệu Face Filter lúc khởi động
-        val allFilters = filterHelper.loadAllFilters()
+        val allFilters = emptyMap<String, List<AppFilter>>()
         cameraViewModel.setFilterTab(isColorTab = false, allFilters)
 
         // Setup CameraController
@@ -114,7 +116,11 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
                     val zoomState = cameraController.getZoomState()?.value ?: return false
-                    cameraController.setZoomRatio(zoomState.zoomRatio * detector.scaleFactor)
+                    val value = zoomState.zoomRatio * detector.scaleFactor
+                    cameraController.setZoomRatio(value)
+                    if((value == zoomState.minZoomRatio && !cameraViewModel.isZoomIn.value)
+                        || (value == zoomState.maxZoomRatio && cameraViewModel.isZoomIn.value))
+                        cameraViewModel.updateZoom()
                     return true
                 }
             })
@@ -139,16 +145,17 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
         // Tab Face Filter
         binding.btnFaceFilter.setOnClickListener {
+            filterAdapter.resetSelection()
+            val forceOpen = cameraViewModel.currentTabFilters.value !=
             cameraViewModel.setFilterTab(false, filterHelper.loadAllFilters())
-            updateTabUI(isColor = false)
-            toggleFilterMenu()
+            toggleFilterMenu(isColor = false)
         }
 
         // Tab Image Filter (Chỉnh màu)
         binding.btnImageFilter.setOnClickListener {
+            filterAdapter.resetSelection()
             cameraViewModel.setFilterTab(true, filterHelper.loadAllFilters())
-            updateTabUI(isColor = true)
-            toggleFilterMenu()
+            toggleFilterMenu(isColor = true)
         }
 
         binding.btnSetting.setOnClickListener {
@@ -166,27 +173,20 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             val zoomState = cameraController.getZoomState()?.value
             val minZoom = zoomState?.minZoomRatio ?: 1f
             if (cameraViewModel.isZoomIn.value) {
-                cameraController.setZoomRatio(2.0f)
+                cameraController.smoothZoom(2.0f)
             } else {
-                cameraController.setZoomRatio(minZoom)
+                cameraController.smoothZoom(minZoom)
             }
             cameraViewModel.updateZoom()
         }
     }
 
-    private fun updateTabUI(isColor: Boolean) {
+    private fun toggleFilterMenu(isColor: Boolean) {
         val activeColor = ContextCompat.getColor(requireContext(), R.color.primary) // Màu nhấn cho tab đang chọn
         val inactiveColor = ContextCompat.getColor(requireContext(), R.color.white)
 
-        binding.btnImageFilter.imageTintList = ColorStateList.valueOf(if (isColor) activeColor else inactiveColor)
-        binding.btnFaceFilter.imageTintList = ColorStateList.valueOf(if (isColor) inactiveColor else activeColor)
-
         // Reset scroll về đầu danh sách và reset vị trí chọn trong adapter
         binding.rvFilters.scrollToPosition(0)
-        filterAdapter.resetSelection()
-    }
-
-    private fun toggleFilterMenu() {
         if (binding.rvFilters.isGone) {
             binding.rvFilters.visibility = View.VISIBLE
             binding.rvFilters.alpha = 0f
@@ -197,6 +197,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 .setDuration(300)
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
+            binding.btnImageFilter.imageTintList = ColorStateList.valueOf(if (isColor) activeColor else inactiveColor)
+            binding.btnFaceFilter.imageTintList = ColorStateList.valueOf(if (isColor) inactiveColor else activeColor)
         } else {
             binding.rvFilters.animate()
                 .alpha(0f)
@@ -204,6 +206,8 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 .setDuration(250)
                 .withEndAction { binding.rvFilters.visibility = View.GONE }
                 .start()
+            binding.btnImageFilter.imageTintList = ColorStateList.valueOf(inactiveColor)
+            binding.btnFaceFilter.imageTintList = ColorStateList.valueOf(inactiveColor)
         }
     }
 
@@ -214,6 +218,17 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 cameraViewModel.flash.collect { isFlashOn ->
                     val src = if (isFlashOn) R.drawable.flash else R.drawable.no_flash
                     binding.btnFlash.setImageResource(src)
+                }
+            }
+
+            launch {
+                cameraViewModel.timer.collect {
+                    var string = it.toString()
+                    if(string != CameraTimer.TIMER_OFF.time.toString())
+                        string += "s"
+                    else string = "OFF"
+                    binding.tvTimer.text = string
+                    textAnimate(binding.tvTimer)
                 }
             }
 
@@ -258,9 +273,16 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 }
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
+            launch {
                 cameraViewModel.selectedColorFilter.collect { colorCode ->
                     applyColorOverlay(colorCode)
+                }
+            }
+
+            launch {
+                cameraViewModel.grid.collect { isGridOn ->
+                    binding.overlayView.isGridOn = isGridOn
+                    binding.overlayView.invalidate()
                 }
             }
         }
@@ -299,6 +321,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     }
 
     override fun onDestroyView() {
+        hideRunnable?.let { binding.tvTimer.removeCallbacks(it) }
         super.onDestroyView()
         cameraController.stop()
     }
@@ -389,6 +412,32 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             visibility = View.VISIBLE
             alpha = 1f
             animate().alpha(0f).setDuration(300).withEndAction { visibility = View.GONE }.start()
+        }
+    }
+    private fun textAnimate(view: View) {
+
+        view.post {
+
+            view.animate().cancel()
+            hideRunnable?.let { view.removeCallbacks(it) }
+
+            view.visibility = View.VISIBLE
+
+            val parentWidth = (view.parent as View).width
+            val centerX = (parentWidth - view.width) / 2f
+
+            view.x = parentWidth.toFloat()
+
+            view.animate()
+                .x(centerX)
+                .setDuration(300)
+                .start()
+
+            hideRunnable = Runnable {
+                view.visibility = View.GONE
+            }
+
+            view.postDelayed(hideRunnable!!, 3000)
         }
     }
 }

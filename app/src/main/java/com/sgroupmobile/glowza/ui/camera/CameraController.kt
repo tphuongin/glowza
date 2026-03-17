@@ -1,5 +1,7 @@
 package com.sgroupmobile.glowza.ui.camera
 
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
@@ -56,25 +58,8 @@ class CameraController @Inject constructor(
             .build()
         FaceDetection.getClient(options)
     }
-
-    private val orientationEventListener by lazy {
-        object : OrientationEventListener(context) {
-            override fun onOrientationChanged(orientation: Int) {
-                if (orientation == ORIENTATION_UNKNOWN) return
-                val rotation = when (orientation) {
-                    in 45..134 -> Surface.ROTATION_270
-                    in 135..224 -> Surface.ROTATION_180
-                    in 225..314 -> Surface.ROTATION_90
-                    else -> Surface.ROTATION_0
-                }
-                imageCapture?.targetRotation = rotation
-            }
-        }
-    }
-
     fun start() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        orientationEventListener.enable()
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
             lifecycleOwner.lifecycleScope.launch {
@@ -232,7 +217,6 @@ class CameraController @Inject constructor(
     }
 
     fun stop() {
-        orientationEventListener.disable()
         faceDetector.close()
         camera = null
     }
@@ -240,6 +224,17 @@ class CameraController @Inject constructor(
     fun setZoomRatio(value: Float) {
         val zoomState = getZoomState()?.value
         camera?.cameraControl?.setZoomRatio(value.coerceIn(zoomState?.minZoomRatio ?: 1f, zoomState?.maxZoomRatio ?: 10f))
+    }
+
+    fun smoothZoom(targetZoom: Float){
+        val zoomState = camera?.cameraInfo?.zoomState?.value ?: return
+        val currentZoom = zoomState.zoomRatio
+        val animator = ValueAnimator.ofFloat(currentZoom, targetZoom)
+        animator.duration = 400
+        animator.addUpdateListener {
+            setZoomRatio(it.animatedValue as Float)
+        }
+        animator.start()
     }
 
     fun getZoomState() = camera?.cameraInfo?.zoomState

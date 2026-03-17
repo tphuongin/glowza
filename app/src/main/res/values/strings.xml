@@ -16,4 +16,5 @@
 
     <string name="save_success">Saved to Glowza Album!</string>
     <string name="save_error">Error, please try again!</string>
+    <string name="timer_notification">3s</string>
 </resources>
