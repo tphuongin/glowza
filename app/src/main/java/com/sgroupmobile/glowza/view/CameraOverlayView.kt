@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceLandmark
 import com.sgroupmobile.glowza.data.model.AppFilter
-import com.sgroupmobile.glowza.common.enum.FilterType
+import com.sgroupmobile.glowza.common.enums.FilterType
 
 class CameraOverlayView(context: Context, attr: AttributeSet): View(context, attr) {
     var isGridOn = true
@@ -26,7 +26,7 @@ class CameraOverlayView(context: Context, attr: AttributeSet): View(context, att
     private val gridPaint = Paint().apply {
         color = Color.WHITE
         alpha = 100
-        strokeWidth = 1f
+        strokeWidth = 2f
     }
 
     fun setFilter(filter: AppFilter?) {

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="normal_padding">20dp</dimen>
+    <dimen name="small_padding">15dp</dimen>
     <dimen name="dialog_margin_top_large">32dp</dimen>
     <dimen name="dialog_margin_top_small">12dp</dimen>
     <dimen name="button_side_margin">8dp</dimen>
     <dimen name="button_side_padding">8dp</dimen>
     <dimen name="normal_bottom_margin">16dp</dimen>
     <dimen name="padding_vertical">12dp</dimen>
+    <dimen name="middle_margin">50dp</dimen>
+    <dimen name="timer_margin">8dp</dimen>
+    <dimen name="middle_padding">35dp</dimen>
 
     <dimen name="title_text">20sp</dimen>
     <dimen name="content_text">16sp</dimen>
@@ -15,13 +19,18 @@
     <dimen name="button_height">56dp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="line_spacing_extra">4dp</dimen>
-    <dimen name="middle_padding">35dp</dimen>
 
     <dimen name="setting_button_width">50dp</dimen>
     <dimen name="setting_button_height">40dp</dimen>
     <dimen name="ratio_button_width">65dp</dimen>
     <dimen name="letter_box_height">80dp</dimen>
-    <dimen name="snap_margin_bottom">93dp</dimen>
+    <dimen name="snap_margin_bottom">100dp</dimen>
     <dimen name="filter_box_size">80dp</dimen>
+    <dimen name="middle_text">40sp</dimen>
+    <dimen name="tab_camera_height">60dp</dimen>
+
+    <dimen name="mode_width">110dp</dimen>
+    <dimen name="bonus_view">45dp</dimen>
+    <dimen name="timer_height">25dp</dimen>
 
 </resources>

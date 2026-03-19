@@ -16,4 +16,11 @@
 
     <string name="save_success">Đã lưu vào Album Glowza!</string>
     <string name="save_error">Lỗi rồi, thử lại nhé!</string>
+
+    <string name="timer_notification">3s</string>
+    <string name="camera_mode">PHOTO</string>
+
+    <string name="title_audio_permission">Quyền truy cập Micro</string>
+    <string name="description_audio_permission">Glowza cần quyền truy cập Micro để bạn có thể quay phim kèm theo âm thanh. Vui lòng cấp quyền trong Cài đặt.</string>
+    <string name="video_timer_default">00:00</string>
 </resources>
