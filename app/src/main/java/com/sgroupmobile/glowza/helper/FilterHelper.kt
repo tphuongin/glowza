@@ -2,7 +2,7 @@ package com.sgroupmobile.glowza.helper
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.sgroupmobile.glowza.common.enum.FilterType
+import com.sgroupmobile.glowza.common.enums.FilterType
 import com.sgroupmobile.glowza.data.model.AppFilter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.json.JSONObject

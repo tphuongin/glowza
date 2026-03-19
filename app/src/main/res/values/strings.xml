@@ -17,4 +17,9 @@
     <string name="save_success">Saved to Glowza Album!</string>
     <string name="save_error">Error, please try again!</string>
     <string name="timer_notification">3s</string>
+    <string name="camera_mode">PHOTO</string>
+
+    <string name="title_audio_permission">Microphone Permission</string>
+    <string name="description_audio_permission">Glowza needs microphone access so you can record videos with sound. Please grant permission in Settings.</string>
+    <string name="video_timer_default">00:00</string>
 </resources>

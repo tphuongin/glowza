@@ -4,7 +4,7 @@ import android.graphics.PointF
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceLandmark
-import com.sgroupmobile.glowza.common.enum.FilterType
+import com.sgroupmobile.glowza.common.enums.FilterType
 import com.sgroupmobile.glowza.data.model.AppFilter
 
 object FilterPainter {

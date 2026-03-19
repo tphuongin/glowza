@@ -1,6 +1,6 @@
 package com.sgroupmobile.glowza.data.model
 
-import com.sgroupmobile.glowza.common.enum.FilterType
+import com.sgroupmobile.glowza.common.enums.FilterType
 data class AppFilter(
     val id: Int,
     val name: String,

@@ -1,14 +1,12 @@
 package com.sgroupmobile.glowza.ui.camera
 
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.*
 import android.net.Uri
 import android.util.Log
 import android.util.Rational
-import android.view.OrientationEventListener
-import android.view.Surface
 import androidx.camera.core.Camera
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
@@ -22,6 +20,13 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.core.ViewPort.FILL_CENTER
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.MediaStoreOutputOptions
+import androidx.camera.video.Quality
+import androidx.camera.video.QualitySelector
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -30,6 +35,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.sgroupmobile.glowza.common.enums.CameraMode
 import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.helper.ImageFilterManager
 import jp.co.cyberagent.android.gpuimage.GPUImage
@@ -49,8 +55,9 @@ class CameraController @Inject constructor(
 ) {
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageCapture: ImageCapture? = null
+    private var videoCapture: VideoCapture<Recorder>? = null
     private var camera: Camera? = null
-
+    private var recording: Recording? = null
     private val faceDetector by lazy {
         val options = FaceDetectorOptions.Builder()
             .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
@@ -64,7 +71,7 @@ class CameraController @Inject constructor(
             cameraProvider = cameraProviderFuture.get()
             lifecycleOwner.lifecycleScope.launch {
                 viewModel.cameraFacing.collect { selector ->
-                    bindUseCases(selector, viewModel.isFaceFilterOn.value)
+                    bindUseCases(selector, viewModel.isFaceFilterOn.value, viewModel.cameraMode.value)
                 }
             }
             lifecycleOwner.lifecycleScope.launch {
@@ -74,28 +81,39 @@ class CameraController @Inject constructor(
             }
             lifecycleOwner.lifecycleScope.launch {
                 viewModel.isFaceFilterOn.collect { isOn ->
-                    bindUseCases(viewModel.cameraFacing.value, isOn)
+                    bindUseCases(viewModel.cameraFacing.value, isOn, viewModel.cameraMode.value)
                 }
             }
         }, ContextCompat.getMainExecutor(context))
     }
 
-    fun bindUseCases(selector: CameraSelector, isFilterOn: Boolean) {
+    fun bindUseCases(selector: CameraSelector, isFilterOn: Boolean, mode: CameraMode) {
         val provider = cameraProvider ?: return
         provider.unbindAll()
+        imageCapture = null
+        videoCapture = null
 
         val preview = Preview.Builder().build().also {
             it.surfaceProvider = previewView.surfaceProvider
         }
 
-        imageCapture = ImageCapture.Builder()
-            .setTargetRotation(previewView.display.rotation)
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .build()
-
         val useCaseGroupBuilder = UseCaseGroup.Builder()
             .addUseCase(preview)
-            .addUseCase(imageCapture!!)
+        if(mode == CameraMode.VIDEO){
+            val recorder = Recorder.Builder()
+                .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
+                .build()
+            videoCapture = VideoCapture.withOutput(recorder)
+            if (videoCapture != null) {
+                useCaseGroupBuilder.addUseCase(videoCapture!!)
+            }
+        } else{
+            imageCapture = ImageCapture.Builder()
+                .setTargetRotation(previewView.display.rotation)
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
+            useCaseGroupBuilder.addUseCase(imageCapture!!)
+        }
 
         if (isFilterOn) {
             val imageAnalyzer = ImageAnalysis.Builder()
@@ -205,6 +223,48 @@ class CameraController @Inject constructor(
         )
 
         return result
+    }
+
+    fun setTorch(isOn: Boolean) {
+        camera?.cameraControl?.enableTorch(isOn)
+    }
+    fun toggleRecording(onVideoEvent: (VideoRecordEvent) -> Unit) {
+        val currentRecording = recording
+        if (currentRecording != null) {
+            currentRecording.stop()
+            recording = null
+            return
+        }
+
+        val name = "Glowza_Video_${System.currentTimeMillis()}.mp4"
+        val contentValues = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+        }
+
+        val mediaStoreOutputOptions = MediaStoreOutputOptions
+            .Builder(context.contentResolver, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+            .setContentValues(contentValues)
+            .build()
+
+        recording = videoCapture?.output
+            ?.prepareRecording(context, mediaStoreOutputOptions)
+            ?.apply {
+                if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                    withAudioEnabled()
+                }
+            }
+            ?.start(ContextCompat.getMainExecutor(context)) { recordEvent ->
+                when (recordEvent) {
+                    is VideoRecordEvent.Status -> {
+                        // Tính toán thời gian đã trôi qua
+                        val stats = recordEvent.recordingStats
+                        val timeInSeconds = stats.recordedDurationNanos / 1_000_000_000
+                        onVideoEvent(recordEvent)
+                    }
+                    else -> onVideoEvent(recordEvent)
+                }
+            }
     }
 
     private fun flipBitmap(source: Bitmap): Bitmap {

@@ -1,4 +1,4 @@
-package com.sgroupmobile.glowza.ui.camera
+package com.sgroupmobile.glowza.ui.camera.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sgroupmobile.glowza.common.enum.CameraRatio
-import com.sgroupmobile.glowza.common.enum.CameraTimer
+import com.sgroupmobile.glowza.common.enums.CameraRatio
+import com.sgroupmobile.glowza.common.enums.CameraTimer
 import com.sgroupmobile.glowza.databinding.CameraSettingBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

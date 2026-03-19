@@ -1,4 +1,4 @@
-package com.sgroupmobile.glowza.common.enum
+package com.sgroupmobile.glowza.common.enums
 
 enum class CameraRatio(val value: String) {
     RATIO_4_3("3:4"),
