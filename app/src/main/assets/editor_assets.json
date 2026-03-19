@@ -1,0 +1,61 @@
+{
+  "stickers": [
+    {
+      "id": 201,
+      "name": "Pastel Heart",
+      "preview_icon": "cat",
+      "res_name": "cat"
+    },
+    {
+      "id": 202,
+      "name": "Sparkle Star",
+      "preview_icon": "chicken",
+      "res_name": "chicken"
+    },
+    {
+      "id": 203,
+      "name": "Pastel Heart",
+      "preview_icon": "girl",
+      "res_name": "girl"
+    },
+    {
+      "id": 204,
+      "name": "Sparkle Star",
+      "preview_icon": "leaf",
+      "res_name": "leaf"
+    }
+  ],
+  "frames": [
+    {
+      "id": 301,
+      "name": "Polaroid",
+      "preview_icon": "frame_polaroid_preview",
+      "res_name": "frame_polaroid",
+      "aspect_ratio": "1:1"
+    },
+    {
+      "id": 302,
+      "name": "Film Roll",
+      "preview_icon": "frame_film_preview",
+      "res_name": "frame_film",
+      "aspect_ratio": "4:3"
+    }
+  ],
+  "filters": [
+    {
+      "id": 101,
+      "name": "Original",
+      "preview_icon": "cat"
+    },
+    {
+      "id": 102,
+      "name": "B&W",
+      "preview_icon": "cat"
+    },
+    {
+      "id": 103,
+      "name": "Vintage",
+      "preview_icon": "cat"
+    }
+  ]
+}

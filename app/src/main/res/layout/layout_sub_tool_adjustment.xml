@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <!-- Thanh Slider để kéo giá trị (Status bar của bạn) -->
+    <com.google.android.material.slider.Slider
+        android:id="@+id/sliderAdjust"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="8dp"
+        app:thumbColor="@color/primary"
+        app:trackColorActive="@color/primary"
+        app:trackColorInactive="#E0E0E0" />
+
+    <!-- Danh sách các option kéo ngang -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAdjustOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="12dp" />
+
+</LinearLayout>

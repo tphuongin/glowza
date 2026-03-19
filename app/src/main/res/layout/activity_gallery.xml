@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="@string/gallery_title"
             android:textColor="@color/onBackground"
-            android:textSize="@dimen/content_text"
+            android:textSize="@dimen/title_text"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

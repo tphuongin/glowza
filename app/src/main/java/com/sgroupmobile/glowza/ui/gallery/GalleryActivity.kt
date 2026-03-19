@@ -2,6 +2,7 @@ package com.sgroupmobile.glowza.ui.gallery
 
 import android.Manifest
 import android.content.ContentUris
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,10 +14,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.tabs.TabLayout
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
-import com.sgroupmobile.glowza.common.enum.GalleryTab
+import com.sgroupmobile.glowza.common.enums.GalleryTab
+import com.sgroupmobile.glowza.common.enums.constants.EXTRA_IMAGE_URI
 import com.sgroupmobile.glowza.data.model.GalleryImage
 import com.sgroupmobile.glowza.databinding.ActivityGalleryBinding
 import com.sgroupmobile.glowza.helper.PermissionHelper
+import com.sgroupmobile.glowza.ui.photo_editor.EditorActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -46,23 +49,34 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
             permission,
             R.layout.request_gallery_permission
         ) {
-            // Sau khi có quyền, load ảnh lần đầu
             val images = fetchImagesFromDevice()
-
             viewModel.setAllPhotos(images)
         }
     }
 
     override fun initData() {
         galleryAdapter = GalleryAdapter { image ->
-            // Logic: Mở màn hình xem chi tiết hoặc chỉnh sửa ảnh
-            Log.d("Glowza", "Clicked: ${image.uri}")
+            // Logic: Mở màn hình Editor và truyền URI của ảnh đã chọn
+            openEditorWithImage(image)
         }
         binding.rvGallery.apply {
             adapter = galleryAdapter
             setHasFixedSize(true)
-            itemAnimator = null // Tắt animation mặc định để tránh nháy khi đổi Tab
+            itemAnimator = null
         }
+    }
+
+    /**
+     * Hàm xử lý chuyển màn hình sang EditorActivity
+     */
+    private fun openEditorWithImage(image: GalleryImage) {
+        val intent = Intent(this, EditorActivity::class.java).apply {
+            // Truyền URI dưới dạng String thông qua Key đã định nghĩa trong EditorActivity
+            putExtra(EXTRA_IMAGE_URI, image.uri.toString())
+        }
+        startActivity(intent)
+
+        // Bạn có thể dùng overridePendingTransition nếu muốn hiệu ứng chuyển cảnh mượt hơn
     }
 
     private fun fetchImagesFromDevice(): List<GalleryImage> {
@@ -103,7 +117,6 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.allPhotos.collect { list ->
-                    // Chỉ cập nhật nếu Tab hiện tại là "Tất cả" (Position 0)
                     if (binding.tabLayoutFilters.selectedTabPosition == 0) {
                         galleryAdapter.submitList(list)
                     }
@@ -113,7 +126,6 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
     }
 
     private fun setupTabs() {
-        // Giả sử GalleryTab có field 'tabName' (Tất cả, Yêu thích, Glowza)
         GalleryTab.entries.forEach {
             binding.tabLayoutFilters.addTab(binding.tabLayoutFilters.newTab().setText(it.name))
         }
@@ -129,7 +141,9 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
                 }
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                binding.rvGallery.smoothScrollToPosition(0)
+            }
         })
     }
 }

@@ -18,4 +18,31 @@
     <string name="save_error">Lỗi rồi, thử lại nhé!</string>
 
     <string name="gallery_title">Bộ sưu tập</string>
+
+    <string name="tool_crop">Cắt</string>
+    <string name="tool_filter">Bộ lọc</string>
+    <string name="tool_adjust">Chỉnh sửa</string>
+    <string name="tool_sticker">Nhãn dán</string>
+    <string name="tool_text">Chữ</string>
+    <string name="tool_draw">Vẽ</string>
+    <string name="tool_frame">Khung</string>
+
+    <string name="crop_free">Tự do</string>
+
+    <string name="adjust_brightness">Độ sáng</string>
+    <string name="adjust_contrast">Tương phản</string>
+    <string name="adjust_saturation">Bão hòa</string>
+
+    <string name="adjust_vignette">Làm mờ viền</string>
+    <string name="adjust_sharpen">Độ sắc nét</string>
+    <string name="adjust_warmth">Độ ấm</string>
+
+    <string name="text_tab_template">Mẫu</string>
+    <string name="text_tab_style">Kiểu chữ</string>
+    <string name="text_tab_font">Phông chữ</string>
+    <string name="text_label_size">Kích thước</string>
+    <string name="text_label_opacity">Độ mờ</string>
+    <string name="text_label_color">Màu sắc</string>
+    <string name="btn_save">Save</string>
+    <string name="title_crop_image">Crop</string>
 </resources>

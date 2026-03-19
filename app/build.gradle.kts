@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.ucrop)
     implementation(libs.glide)
     kapt (libs.compiler)
     implementation(libs.gpuimage)

@@ -26,4 +26,21 @@
     <dimen name="filter_box_size">80dp</dimen>
     <dimen name="tool_bar_height">56dp</dimen>
 
+    <dimen name="editor_toolbar_margin">16dp</dimen>
+    <dimen name="editor_toolbar_radius">24dp</dimen>
+    <dimen name="editor_toolbar_elevation">8dp</dimen>
+    <dimen name="editor_tool_padding">8dp</dimen>
+
+    <dimen name="editor_control_margin">16dp</dimen>
+    <dimen name="editor_control_size">40dp</dimen>
+    <dimen name="editor_control_spacing">8dp</dimen>
+
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_normal">8dp</dimen>
+    <dimen name="editor_toolbar_height">90dp</dimen>
+
+    <dimen name="editor_tab_padding">20dp</dimen>
+
+    <dimen name="editor_tab_icon_size">28dp</dimen>
+
 </resources>
