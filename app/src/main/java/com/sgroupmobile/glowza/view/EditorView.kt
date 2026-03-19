@@ -13,8 +13,6 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var baseBitmap: Bitmap? = null
     private val baseMatrix = Matrix()
     private val basePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
-
-    // --- State cho Draw (Sửa lỗi của Phương) ---
     private var isDrawMode = false
     private val drawPaths = mutableListOf<DrawItem>()
     private var currentPath: Path? = null
@@ -23,11 +21,8 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var brushSize = 20f
     private var isEraserMode = false
 
-    // --- State khác ---
     private val items = mutableListOf<BaseItem>()
     private var selectedItem: BaseItem? = null
-    private var isCropMode = false
-    private val cropRect = RectF()
     private var filterMatrix: ColorMatrix? = null
     private var brightness = 0f
     private var contrast = 1f
@@ -102,7 +97,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     fun addItem(item: BaseItem) {
-        if (isCropMode || isDrawMode) return
+        if (isDrawMode) return
         items.forEach { it.isSelected = false }; item.isSelected = true; selectedItem = item
         val scale = (width * 0.4f) / item.getWidth()
         item.matrix.postScale(scale, scale)
@@ -110,15 +105,6 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         items.add(item); invalidate()
     }
 
-    fun setCropMode(enabled: Boolean, ratio: Float = 0f) {
-        this.isCropMode = enabled
-        this.selectedItem = null
-        if (enabled) {
-            val mx = width * 0.1f; val my = height * 0.1f
-            cropRect.set(mx, my, width - mx, height - my)
-        }
-        invalidate()
-    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -137,23 +123,16 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         // 3. Vẽ Stickers/Text
         for (item in items) {
             item.draw(canvas, Paint(Paint.ANTI_ALIAS_FLAG))
-            if (item.isSelected && !isCropMode && !isDrawMode) {
+            if (item.isSelected && !isDrawMode) {
                 // Vẽ khung chọn (Code lược bỏ cho ngắn gọn, Phương giữ code cũ nhé)
             }
         }
 
-        // 4. Vẽ Crop Overlay
-        if (isCropMode) {
-            val overlayPaint = Paint().apply { color = Color.parseColor("#99000000") }
-            canvas.drawRect(0f, 0f, width.toFloat(), cropRect.top, overlayPaint)
-            // ... (vẽ các phần overlay còn lại)
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (isDrawMode) return handleDrawTouch(event)
-        if (isCropMode) return false // Xử lý Crop riêng
 
         val x = event.x
         val y = event.y

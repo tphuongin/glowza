@@ -4,14 +4,12 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.lifecycle.viewModelScope
 import com.sgroupmobile.glowza.base.BaseViewModel
 import com.sgroupmobile.glowza.common.enums.ToolType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -26,7 +24,12 @@ class EditorViewModel @Inject constructor(
     private val _currentTool = MutableStateFlow<ToolType?>(null)
     val currentTool = _currentTool.asStateFlow()
 
+    // Quan trọng: Lưu trữ URI hiện tại của ảnh (có thể đã qua crop)
+    private val _currentUri = MutableStateFlow<Uri?>(null)
+    val currentUri = _currentUri.asStateFlow()
+
     fun loadImage(uri: Uri) {
+        _currentUri.value = uri // Cập nhật URI hiện tại
         launch {
             val bitmap = withContext(Dispatchers.IO) {
                 try {
@@ -40,7 +43,13 @@ class EditorViewModel @Inject constructor(
         }
     }
 
-    fun selectTool(type: ToolType) {
+    fun selectTool(type: ToolType? = null) {
+        // Nếu chọn cùng 1 tool, cho phép set lại để trigger UI nếu cần
+        // Nhưng với CROP, ta nên xử lý khéo léo hơn ở Activity
         _currentTool.value = type
+    }
+
+    fun resetTool() {
+        _currentTool.value = null
     }
 }
