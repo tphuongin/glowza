@@ -16,4 +16,6 @@
 
     <string name="save_success">Saved to Glowza Album!</string>
     <string name="save_error">Error, please try again!</string>
+
+    <string name="gallery_title">Gallery</string>
 </resources>
