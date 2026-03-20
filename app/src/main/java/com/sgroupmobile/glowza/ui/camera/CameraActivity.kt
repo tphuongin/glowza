@@ -21,7 +21,7 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>() {
 
     override fun setupInset() {}
     private fun checkPermission() {
-        permissionHelper = PermissionHelper(this)
+        permissionHelper = PermissionHelper(this, this)
         permissionHelper.requestPermission(
             Manifest.permission.CAMERA,
             R.layout.request_camera_permission
@@ -35,7 +35,10 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>() {
         if (currentFragment == null) {
             supportFragmentManager.beginTransaction()
                 .replace(binding.fragmentContainerView.id, CameraFragment())
+                .addToBackStack(null)
                 .commit()
         }
     }
+
+
 }

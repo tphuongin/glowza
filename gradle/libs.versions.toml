@@ -20,6 +20,9 @@ activity = "1.12.4"
 constraintlayout = "2.2.1"
 playServicesMlkitFaceDetection = "17.1.0"
 ucrop = "2.2.8"
+legacySupportV4 = "1.0.0"
+lifecycleLivedataKtx = "2.6.1"
+lifecycleViewmodelKtx = "2.6.1"
 
 [libraries]
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCamera2" }
@@ -47,6 +50,9 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 play-services-mlkit-face-detection = { module = "com.google.android.gms:play-services-mlkit-face-detection", version.ref = "playServicesMlkitFaceDetection" }
 ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -73,7 +73,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     private var isRecording = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        permissionHelper = PermissionHelper(requireActivity() as AppCompatActivity)
+        permissionHelper = PermissionHelper(this, requireContext())
     }
 
     override fun provideBinding(
@@ -248,6 +248,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 }
             }
         })
+        binding.btnExit.setOnClickListener {
+            requireActivity().finish()
+        }
     }
     private fun formatDuration(seconds: Long): String {
         val minutes = seconds / 60

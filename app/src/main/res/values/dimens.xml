@@ -40,7 +40,14 @@
     <dimen name="editor_toolbar_height">90dp</dimen>
 
     <dimen name="editor_tab_padding">20dp</dimen>
-
+    <dimen name="bonus_view">40dp</dimen>
+    <dimen name="middle_text">16sp</dimen>
+    <dimen name="middle_margin">16dp</dimen>
+    <dimen name="timer_margin">20dp</dimen>
+    <dimen name="timer_height">48dp</dimen>
+    <dimen name="tab_camera_height">60dp</dimen>
+    <dimen name="mode_width">80dp</dimen>
+    <dimen name="small_padding">8dp</dimen>
     <dimen name="editor_tab_icon_size">28dp</dimen>
 
 </resources>

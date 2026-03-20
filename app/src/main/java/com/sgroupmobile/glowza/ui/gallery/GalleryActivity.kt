@@ -6,8 +6,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,6 +15,7 @@ import com.google.android.material.tabs.TabLayout
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
 import com.sgroupmobile.glowza.common.enums.Constants.EXTRA_IMAGE_URI
+import com.sgroupmobile.glowza.common.enums.GalleryMode
 import com.sgroupmobile.glowza.common.enums.GalleryTab
 import com.sgroupmobile.glowza.data.model.GalleryImage
 import com.sgroupmobile.glowza.databinding.ActivityGalleryBinding
@@ -29,6 +30,12 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
     private lateinit var galleryAdapter: GalleryAdapter
     private lateinit var permissionHelper: PermissionHelper
 
+    private val mode: GalleryMode by lazy {
+        GalleryMode.valueOf(
+            intent.getStringExtra("mode") ?: GalleryMode.SINGLE.name
+        )
+    }
+
     override fun provideBinding(): ActivityGalleryBinding = ActivityGalleryBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +45,7 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
     }
 
     private fun checkPermission() {
-        permissionHelper = PermissionHelper(this)
+        permissionHelper = PermissionHelper(this, this)
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
         } else {
@@ -55,20 +62,29 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
     }
 
     override fun initData() {
-        galleryAdapter = GalleryAdapter { image ->
-            // Logic: Mở màn hình Editor và truyền URI của ảnh đã chọn
-            openEditorWithImage(image)
-        }
+        galleryAdapter = GalleryAdapter(
+            mode = mode,
+            onSingleClick = { image ->
+                openEditorWithImage(image)
+            },
+            onMultiChange = { selectedList ->
+                updateSelectionUI(selectedList)
+            }
+        )
         binding.rvGallery.apply {
             adapter = galleryAdapter
             setHasFixedSize(true)
             itemAnimator = null
         }
     }
+    private fun updateSelectionUI(list: List<GalleryImage>) {
+        if (mode == GalleryMode.MULTIPLE) {
+            binding.btnDone.isVisible = true
+            binding.btnDone.text = "Tiếp (${list.size})"
+            binding.btnDone.isEnabled = list.size >= 2
+        }
+    }
 
-    /**
-     * Hàm xử lý chuyển màn hình sang EditorActivity
-     */
     private fun openEditorWithImage(image: GalleryImage) {
         val intent = Intent(this, EditorActivity::class.java).apply {
             // Truyền URI dưới dạng String thông qua Key đã định nghĩa trong EditorActivity
@@ -76,7 +92,6 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
         }
         startActivity(intent)
 
-        // Bạn có thể dùng overridePendingTransition nếu muốn hiệu ứng chuyển cảnh mượt hơn
     }
 
     private fun fetchImagesFromDevice(): List<GalleryImage> {
@@ -116,12 +131,17 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
     override fun setupObservers() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Lắng nghe danh sách gốc
                 viewModel.allPhotos.collect { list ->
-                    if (binding.tabLayoutFilters.selectedTabPosition == 0) {
-                        galleryAdapter.submitList(list)
-                    }
+                    filterDataByTab(binding.tabLayoutFilters.selectedTabPosition)
                 }
             }
+        }
+    }
+
+    override fun setupListeners() {
+        binding.btnBack.setOnClickListener {
+            finish()
         }
     }
 
@@ -132,18 +152,23 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
 
         binding.tabLayoutFilters.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                lifecycleScope.launch {
-                    when (tab?.position) {
-                        0 -> viewModel.allPhotos.collect { galleryAdapter.submitList(it) }
-                        1 -> viewModel.favoritePhotos.collect { galleryAdapter.submitList(it) }
-                        2 -> viewModel.glowzaPhotos.collect { galleryAdapter.submitList(it) }
-                    }
-                }
+                filterDataByTab(tab?.position ?: 0)
             }
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 binding.rvGallery.smoothScrollToPosition(0)
             }
         })
+    }
+
+    // Hàm bổ trợ để đẩy dữ liệu vào Adapter dựa trên Tab
+    private fun filterDataByTab(position: Int) {
+        lifecycleScope.launch {
+            when (position) {
+                0 -> viewModel.allPhotos.collect { galleryAdapter.submitList(it) }
+                1 -> viewModel.favoritePhotos.collect { galleryAdapter.submitList(it) }
+                2 -> viewModel.glowzaPhotos.collect { galleryAdapter.submitList(it) }
+            }
+        }
     }
 }

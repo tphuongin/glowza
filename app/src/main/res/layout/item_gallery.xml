@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:padding="1dp">
 
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -40,5 +41,22 @@
 
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
+    <!-- overlay -->
+    <View
+        android:id="@+id/viewOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:visibility="gone"/>
+
+    <!-- check icon -->
+    <ImageView
+        android:id="@+id/imgCheck"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="6dp"
+        android:src="@drawable/ic_check"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

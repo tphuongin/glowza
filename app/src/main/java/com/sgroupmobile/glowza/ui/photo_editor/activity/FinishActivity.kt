@@ -3,16 +3,10 @@ package com.sgroupmobile.glowza.ui.photo_editor.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.sgroupmobile.glowza.MainActivity
-import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
-import com.sgroupmobile.glowza.data.model.GalleryImage
 import com.sgroupmobile.glowza.databinding.ActivityFinishBinding
 import com.sgroupmobile.glowza.ui.gallery.GalleryActivity
+import com.sgroupmobile.glowza.ui.home.MainActivity
 
 class FinishActivity : BaseActivity<ActivityFinishBinding>() {
     override fun provideBinding(): ActivityFinishBinding = ActivityFinishBinding.inflate(layoutInflater)

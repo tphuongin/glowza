@@ -1,0 +1,58 @@
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFunction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-60dp"
+            android:padding="12dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ảnh đã chỉnh sửa"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="16dp"
+            android:textColor="@color/onBackground"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video của bạn"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="16dp"
+            android:textColor="@color/onBackground"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvVideos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
