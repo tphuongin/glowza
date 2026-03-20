@@ -12,3 +12,4 @@ data class AdjustmentItem(
     val defaultValue: Float, // Giá trị mặc định (ví dụ: 0.0f)
     var isSelected: Boolean = false
 )
+

@@ -1,5 +1,6 @@
 package com.sgroupmobile.glowza.ui.photo_editor.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -16,31 +17,35 @@ class AdjustmentAdapter(
     inner class ViewHolder(val binding: ItemAdjustmentOptionBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        Log.d("Glowza_Debug", "Adapter: Đang tạo ViewHolder")
         val binding = ItemAdjustmentOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.binding.tvAdjustName.text = item.name
-        holder.binding.ivAdjustIcon.setImageResource(item.icon)
-
         val context = holder.itemView.context
-        val color = if (item.isSelected)
-            ContextCompat.getColor(context, R.color.primary)
-        else
-            ContextCompat.getColor(context, R.color.onSurfaceVariant)
 
-        holder.binding.ivAdjustIcon.setColorFilter(color)
-        holder.binding.tvAdjustName.setTextColor(color)
+        holder.binding.apply {
+            // Đồng bộ với ID snake_case trong XML: tv_adjust_name, iv_adjust_icon
+            tvAdjustName.text = item.name
+            ivAdjustIcon.setImageResource(item.icon)
 
-        holder.itemView.setOnClickListener {
-            if (item.isSelected) return@setOnClickListener
+            val color = if (item.isSelected)
+                ContextCompat.getColor(context, R.color.primary)
+            else
+                ContextCompat.getColor(context, R.color.onSurfaceVariant)
 
-            items.forEach { it.isSelected = false }
-            item.isSelected = true
-            notifyDataSetChanged()
-            onItemSelected(item)
+            ivAdjustIcon.setColorFilter(color)
+            tvAdjustName.setTextColor(color)
+
+            root.setOnClickListener {
+                if (item.isSelected) return@setOnClickListener
+                items.forEach { it.isSelected = false }
+                item.isSelected = true
+                notifyDataSetChanged()
+                onItemSelected(item)
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextPaint
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,7 +31,6 @@ import com.sgroupmobile.glowza.provider.EditorToolProvider
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.*
 import com.sgroupmobile.glowza.util.FilterUtils
 import com.yalantis.ucrop.UCrop
-import com.yalantis.ucrop.model.AspectRatio
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -38,13 +38,14 @@ import java.io.File
 import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewModelScope
 
 @AndroidEntryPoint
 class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
-    private val viewModel: EditorViewModel by viewModels()
+    val viewModel: EditorViewModel by viewModels()
 
-    // Biến lưu trữ Action đang chờ xác nhận (Preview)
+
     private var pendingAction: EditorAction? = null
 
     override fun provideBinding(): ActivityEditorBinding = ActivityEditorBinding.inflate(layoutInflater)
@@ -63,6 +64,12 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 launch {
                     viewModel.previewBitmap.collectLatest { bitmap ->
                         bitmap?.let { binding.editorView.setBaseBitmap(it) }
+                    }
+                }
+                launch {
+                    viewModel.itemList.collectLatest { list ->
+                        binding.editorView.updateItems(list)
+                        binding.editorView.invalidate()
                     }
                 }
 
@@ -110,7 +117,6 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
     }
 
-    // --- LOGIC XÁC NHẬN / HỦY (Preview System) ---
 
     fun confirmPendingAction() {
         pendingAction?.let {
@@ -118,44 +124,24 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
             pendingAction = null
         }
     }
-    fun cancelPendingAction() {
-        val action = pendingAction ?: return
-
-        when (action) {
-            is EditorAction.Filter -> {
-                // QUAN TRỌNG: Reset filter ngay trên View
-                binding.editorView.resetPreviewFilters()
-            }
-            is EditorAction.Sticker, is EditorAction.Text -> {
-                binding.editorView.removeLastItemIfPending()
-            }
-            else -> {
-                viewModel.renderImage()
-            }
-        }
-
-        pendingAction = null
-        viewModel.resetTool()
-    }
 
     override fun setupListeners() {
         super.setupListeners()
 
-        // Sửa nút Back: Nếu đang có preview thì hủy preview, nếu không thì mới thoát
         binding.btnBack.setOnClickListener {
-            if (pendingAction != null) {
+
+            if (binding.subToolContainer.isVisible) {
+                // Nếu thanh công cụ đang hiện, cứ đóng nó lại đã
                 cancelPendingAction()
+                closeSubTool()
             } else {
                 finish()
             }
         }
 
-        binding.btnBack.setOnClickListener { finish() }
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnRedo.setOnClickListener { viewModel.redo() }
     }
-
-    // --- TAB & TOOLS ---
 
     private fun setupMainTabs() {
         val tabLayout = binding.tabLayoutEditorTools
@@ -208,15 +194,8 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         })
     }
 
-    private fun handleToolChange(type: ToolType) {
-        binding.editorView.setDrawMode(type == ToolType.DRAW)
-        when (type) {
-            ToolType.ADJUST -> showAdjustmentSubTool()
-            ToolType.TEXT -> showTextSubTool()
-            ToolType.DRAW -> showDrawSubTool()
-            else -> { binding.subToolContainer.visibility = View.GONE }
-        }
-    }
+    fun getPendingAction(): EditorAction? = pendingAction
+
 
     private fun clearAllTabStyles() {
         val tabLayout = binding.tabLayoutEditorTools
@@ -233,10 +212,11 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
 
         val sheet = StickerBottomSheetFragment.newInstance(title, type) { id ->
-            // Khi nhấn vào Item: Chỉ hiện Preview ảo lên màn hình
+            // Chỉ truyền ID vào, việc xử lý nằm ở Activity
             handlePreviewChange(type, id)
         }
         sheet.show(supportFragmentManager, "AssetSheet")
+        // Giữ nguyên delay clear style
         binding.tabLayoutEditorTools.postDelayed({ clearAllTabStyles() }, 100)
     }
 
@@ -245,20 +225,25 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
             "filters" -> {
                 val matrix = FilterUtils.getMatrixById(id)
                 matrix?.let {
-                    // Vẽ trực tiếp lên View để người dùng thấy ngay, nhưng chưa addAction
                     binding.editorView.setFilter(it)
                     pendingAction = EditorAction.Filter(it)
+                    // Đối với Filter, nhấn là chốt ngay
                 }
             }
             "stickers", "frames" -> {
+                // SỬA TẠI ĐÂY: Chỉ thêm vào EditorView để người dùng di chuyển/xoay/phóng to
+                // KHÔNG gán vào pendingAction và KHÔNG confirm ngay lập tức
                 val bitmap = BitmapFactory.decodeResource(resources, id)
                 val item = StickerItem(bitmap)
-                binding.editorView.addItem(item)
-                pendingAction = EditorAction.Sticker(bitmap, item.matrix)
+//                binding.editorView.addItem(item)
+                viewModel.addNewItem(item)
+                viewModel.addAction(EditorAction.Sticker(bitmap, item.matrix))
+
+                // Sticker sẽ được xác nhận vào ViewModel khi người dùng nhấn nút "Save"
+                // hoặc khi chuyển Tool (tùy logic bạn muốn)
             }
         }
     }
-
     // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
 
     private fun showCropSubTool() {
@@ -294,19 +279,63 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
     }
 
     private fun replaceSubToolFragment(fragment: androidx.fragment.app.Fragment) {
+        // Thêm Log để kiểm tra
+        Log.d("Glowza_Logic", "Activity: replaceSubToolFragment gọi")
+
         supportFragmentManager.beginTransaction()
             .replace(R.id.sub_tool_container, fragment)
-            .commit()
+            // Đảm bảo commitNow để Fragment mới được đưa vào ngay lập tức
+            .commitNowAllowingStateLoss()
+
         binding.subToolContainer.visibility = View.VISIBLE
     }
-
     private fun showAdjustmentSubTool() = replaceSubToolFragment(AdjustmentSubToolFragment().apply {
         onAdjustmentChanged = { b, c, s ->
+            // 1. Hiển thị preview lên View ngay lập tức
             binding.editorView.setAdjustments(b, c, s)
-            // Lưu lại Adjust preview nếu muốn chốt bằng nút V của Activity
+
+            // 2. Lưu vào pendingAction để chờ xác nhận hoặc hủy
+            // Bạn cần đảm bảo EditorAction có thêm class Adjust(b, c, s)
+            pendingAction = EditorAction.Adjustment(b, c, s)
         }
     })
 
+    // Cập nhật hàm cancelPendingAction để xử lý thêm Adjust
+    // 1. Hàm hủy Preview (Chỉ lo phần ảnh)
+    fun cancelPendingAction() {
+        val action = pendingAction ?: return
+        when (action) {
+            is EditorAction.Filter -> binding.editorView.resetPreviewFilters()
+            is EditorAction.Adjustment -> binding.editorView.setAdjustments(0f, 1f, 1f)
+            is EditorAction.Sticker, is EditorAction.Text -> binding.editorView.removeLastItemIfPending()
+            else -> viewModel.renderImage()
+        }
+        pendingAction = null
+    }
+
+    // 2. Hàm đóng giao diện (Chỉ lo phần UI)
+    fun closeSubTool() {
+        Log.d("Glowza_Logic", "Activity: closeSubTool gọi. Đang resetTool trong ViewModel")
+        pendingAction = null // Xóa bỏ mọi pending đang treo
+        viewModel.resetTool() // Bắn tin hiệu để ẩn sub_tool_container
+    }
+
+    // 3. Sửa lại handleToolChange để tránh vòng lặp
+    private fun handleToolChange(type: ToolType) {
+        Log.d("Glowza_Logic", "Activity: handleToolChange sang tool $type")
+        // KHÔNG gọi cancelPendingAction ở đây nữa,
+        // để Fragment tự lo việc dọn dẹp khi nó bị thay thế.
+
+        binding.editorView.setDrawMode(type == ToolType.DRAW)
+        when (type) {
+            ToolType.ADJUST -> showAdjustmentSubTool()
+            ToolType.TEXT -> showTextSubTool()
+            ToolType.DRAW -> showDrawSubTool()
+            else -> {
+                binding.subToolContainer.visibility = View.GONE
+            }
+        }
+    }
     private fun showDrawSubTool() = replaceSubToolFragment(DrawSubToolFragment().apply {
         onDrawConfigChanged = { color, size, isEraser -> binding.editorView.setBrushConfig(color, size, isEraser) }
         onUndoClicked = { binding.editorView.undoLastDraw() }

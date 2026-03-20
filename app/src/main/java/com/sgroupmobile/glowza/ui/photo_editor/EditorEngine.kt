@@ -10,38 +10,44 @@ class EditorEngine(private val original: Bitmap) {
     fun render(actions: List<EditorAction>): Bitmap {
         if (actions.isEmpty()) return original.copy(Bitmap.Config.ARGB_8888, true)
 
-        // 1. Sắp xếp: Priority thấp (0-Crop, 1-Filter) làm trước.
-        // 2. Trong cùng priority (2-Sticker/Text), cái nào làm sau (timestamp lớn) đè lên cái cũ.
         val sortedActions = actions.sortedWith(
             compareBy<EditorAction> { it.priority }.thenBy { it.timestamp }
         )
 
-        // Bắt đầu từ bản sao của ảnh gốc
         var resultBitmap = original.copy(Bitmap.Config.ARGB_8888, true)
 
         for (action in sortedActions) {
             when (action) {
                 is EditorAction.Crop -> {
-                    // Thay thế nền bằng ảnh đã crop.
-                    // Priority 0 đảm bảo các Sticker cũ sẽ bị cắt theo bố cục mới.
                     resultBitmap = action.croppedBitmap?.copy(Bitmap.Config.ARGB_8888, true)
                 }
 
                 is EditorAction.Filter -> {
-                    // Áp dụng filter lên bitmap hiện tại
                     resultBitmap = applyFilter(resultBitmap, action.colorMatrix)
                 }
 
+                // --- BỔ SUNG: XỬ LÝ ADJUSTMENT ---
+                is EditorAction.Adjustment -> {
+                    resultBitmap = applyAdjustments(
+                        resultBitmap,
+                        action.brightness,
+                        action.contrast,
+                        action.saturation
+                    )
+                }
+
                 is EditorAction.Sticker -> {
-                    val canvas = Canvas(resultBitmap)
-                    canvas.drawBitmap(action.sticker, action.matrix, null)
+//                    val canvas = Canvas(resultBitmap)
+//                    // Vẽ sticker bằng Matrix chính xác mà người dùng đã kéo ở EditorView
+//                    canvas.drawBitmap(action.sticker, action.matrix, null)
                 }
 
                 is EditorAction.Text -> {
                     val canvas = Canvas(resultBitmap)
                     canvas.withSave {
                         concat(action.matrix)
-                        drawText(action.text, 0f, 0f, action.textPaint)
+                        // Giả sử textPaint đã được setup màu sắc và kích thước
+                        canvas.drawText(action.text, 0f, 0f, action.textPaint)
                     }
                 }
 
@@ -55,8 +61,6 @@ class EditorEngine(private val original: Bitmap) {
                     val destRect = Rect(0, 0, resultBitmap.width, resultBitmap.height)
                     canvas.drawBitmap(action.frame, null, destRect, null)
                 }
-
-                else -> {}
             }
         }
         return resultBitmap
@@ -65,9 +69,42 @@ class EditorEngine(private val original: Bitmap) {
     private fun applyFilter(source: Bitmap, matrix: ColorMatrix): Bitmap {
         val bitmap = createBitmap(source.width, source.height)
         val canvas = Canvas(bitmap)
-        val paint = Paint().apply {
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             colorFilter = ColorMatrixColorFilter(matrix)
         }
+        canvas.drawBitmap(source, 0f, 0f, paint)
+        return bitmap
+    }
+
+    /**
+     * Hàm xử lý Adjustment: Tính toán ma trận màu tổng hợp
+     */
+    private fun applyAdjustments(source: Bitmap, b: Float, c: Float, s: Float): Bitmap {
+        val bitmap = createBitmap(source.width, source.height)
+        val canvas = Canvas(bitmap)
+
+        // 1. Tạo ma trận tổng hợp
+        val cm = ColorMatrix()
+
+        // Áp dụng Contrast và Brightness
+        // Công thức: Color = Contrast * Color + Brightness
+        val adj = ColorMatrix(floatArrayOf(
+            c, 0f, 0f, 0f, b * 255f,
+            0f, c, 0f, 0f, b * 255f,
+            0f, 0f, c, 0f, b * 255f,
+            0f, 0f, 0f, 1f, 0f
+        ))
+        cm.postConcat(adj)
+
+        // Áp dụng Saturation
+        val sat = ColorMatrix()
+        sat.setSaturation(s)
+        cm.postConcat(sat)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            colorFilter = ColorMatrixColorFilter(cm)
+        }
+
         canvas.drawBitmap(source, 0f, 0f, paint)
         return bitmap
     }

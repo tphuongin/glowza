@@ -14,8 +14,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.tabs.TabLayout
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
+import com.sgroupmobile.glowza.common.enums.Constants.EXTRA_IMAGE_URI
 import com.sgroupmobile.glowza.common.enums.GalleryTab
-import com.sgroupmobile.glowza.common.enums.constants.EXTRA_IMAGE_URI
 import com.sgroupmobile.glowza.data.model.GalleryImage
 import com.sgroupmobile.glowza.databinding.ActivityGalleryBinding
 import com.sgroupmobile.glowza.helper.PermissionHelper

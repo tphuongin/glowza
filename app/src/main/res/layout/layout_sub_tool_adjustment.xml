@@ -5,26 +5,64 @@
     android:layout_height="wrap_content"
     android:background="@color/surface"
     android:orientation="vertical"
-    android:paddingBottom="16dp">
+    android:paddingBottom="8dp">
 
-    <!-- Thanh Slider để kéo giá trị (Status bar của bạn) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btn_cancel_adjust"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/exit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onSurfaceVariant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Điều chỉnh"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_confirm_adjust"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_check"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.slider.Slider
-        android:id="@+id/sliderAdjust"
+        android:id="@+id/slider_adjust"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="32dp"
+        app:labelBehavior="gone"
         app:thumbColor="@color/primary"
         app:trackColorActive="@color/primary"
+        app:trackHeight="3dp"
         app:trackColorInactive="#E0E0E0" />
 
-    <!-- Danh sách các option kéo ngang -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAdjustOptions"
+        android:id="@+id/rv_adjust_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:clipToPadding="false"
-        android:paddingHorizontal="12dp" />
+        android:overScrollMode="never" />
 
 </LinearLayout>

@@ -21,6 +21,9 @@ import javax.inject.Inject
 import androidx.core.graphics.scale
 import com.sgroupmobile.glowza.util.FilterUtils
 import androidx.core.graphics.createBitmap
+import com.sgroupmobile.glowza.base.BaseItem
+import com.sgroupmobile.glowza.data.model.StickerItem
+import com.sgroupmobile.glowza.data.model.TextItem
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
@@ -34,6 +37,8 @@ class EditorViewModel @Inject constructor(
     val previewBitmap = _previewBitmap.asStateFlow()
     private val _filterPreviews = MutableStateFlow<List<ImageFilter>>(emptyList())
     val filterPreviews = _filterPreviews.asStateFlow()
+    private val _itemList = MutableStateFlow<List<BaseItem>>(emptyList())
+    val itemList = _itemList.asStateFlow()
 
     private val _currentTool = MutableStateFlow<ToolType?>(null)
     val currentTool = _currentTool.asStateFlow()
@@ -45,13 +50,16 @@ class EditorViewModel @Inject constructor(
     private val undoStack = mutableListOf<EditorAction>()
     private val redoStack = mutableListOf<EditorAction>()
 
-    private val _navigationState = MutableStateFlow(NavigationState(
-        canUndo = false,
-        canRedo = false
-    ))
+    private val _navigationState = MutableStateFlow(
+        NavigationState(
+            canUndo = false,
+            canRedo = false
+        )
+    )
     val navigationState = _navigationState.asStateFlow()
 
     data class NavigationState(val canUndo: Boolean, val canRedo: Boolean)
+
     fun loadImage(uri: Uri) {
         clearFilterPreviews()
         _currentUri.value = uri
@@ -79,19 +87,50 @@ class EditorViewModel @Inject constructor(
         renderImage()
     }
 
+    fun removeLastItem() {
+        val currentList = _itemList.value
+        if (currentList.isNotEmpty()) {
+            _itemList.value = currentList.dropLast(1)
+        }
+    }
+
     fun undo() {
         if (undoStack.isNotEmpty()) {
-            redoStack.add(undoStack.removeAt(undoStack.lastIndex))
+            val action = undoStack.removeAt(undoStack.lastIndex)
+            redoStack.add(action)
+            if (action is EditorAction.Sticker || action is EditorAction.Text) {
+                removeLastItem()
+            }
             renderImage()
         }
     }
 
+    fun addNewItem(item: BaseItem) {
+        _itemList.value += item
+    }
+
     fun redo() {
         if (redoStack.isNotEmpty()) {
-            undoStack.add(redoStack.removeAt(redoStack.lastIndex))
+            val action = redoStack.removeAt(redoStack.lastIndex)
+            undoStack.add(action)
+            if (action is EditorAction.Sticker) {
+                val item = StickerItem(action.sticker).apply {
+                    this.matrix.set(action.matrix)
+                    this.bitmap = action.sticker
+                }
+                addNewItem(item)
+            } else if (action is EditorAction.Text) {
+                val item = TextItem(action.text).apply {
+                    this.matrix = action.matrix
+                    this.text = action.text
+                }
+                addNewItem(item)
+            }
             renderImage()
         }
     }
+
+
     fun prepareFilterPreviews() {
         // Lấy ảnh hiện tại đang hiển thị (đã có thể qua Crop/Sticker...)
         val originalBitmap = originalBitmap ?: return
@@ -113,9 +152,11 @@ class EditorViewModel @Inject constructor(
             _filterPreviews.value = filters
         }
     }
+
     fun clearFilterPreviews() {
         _filterPreviews.value = emptyList()
     }
+
     private fun createCenterCropThumbnail(src: Bitmap, size: Int): Bitmap {
         val width = src.width
         val height = src.height
@@ -149,6 +190,7 @@ class EditorViewModel @Inject constructor(
         canvas.drawBitmap(src, 0f, 0f, paint)
         return bitmap
     }
+
     fun renderImage() {
         val engine = editorEngine ?: return
         launch(Dispatchers.Default) {
@@ -175,7 +217,8 @@ class EditorViewModel @Inject constructor(
     fun selectTool(type: ToolType? = null) {
         _currentTool.value = type
     }
-    fun resetTool(){
+
+    fun resetTool() {
         _currentTool.value = null
     }
 }

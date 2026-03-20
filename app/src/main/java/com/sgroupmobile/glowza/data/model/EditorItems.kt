@@ -12,7 +12,7 @@ import com.sgroupmobile.glowza.base.BaseItem
 import androidx.core.graphics.withMatrix
 
 // Lớp cho Sticker
-class StickerItem(val bitmap: Bitmap) : BaseItem() {
+class StickerItem(var bitmap: Bitmap) : BaseItem() {
     override fun draw(canvas: Canvas, paint: Paint) {
         canvas.drawBitmap(bitmap, matrix, paint)
     }

@@ -2,6 +2,7 @@ package com.sgroupmobile.glowza.ui.photo_editor.fragment
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,6 @@ import com.sgroupmobile.glowza.ui.photo_editor.adapter.GenericGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 @AndroidEntryPoint
 class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -29,7 +29,6 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
     private var _binding: LayoutBottomSheetGridBinding? = null
     private val binding get() = _binding!!
 
-    // Dùng chung ViewModel với Activity để quản lý preview
     private val viewModel: EditorViewModel by activityViewModels()
 
     var onItemSelected: ((Int) -> Unit)? = null
@@ -59,7 +58,12 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.tvSheetTitle.text = title
 
-        // Thiết lập Grid hiển thị
+        // CHỈ ẨN NÚT NẾU LÀ STICKER
+        if (assetType == "stickers") {
+            binding.btnClose.visibility = View.GONE
+            binding.btnConfirm.visibility = View.GONE
+        }
+
         if (assetType == "filters") {
             setupFilterGrid()
         } else {
@@ -70,13 +74,11 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupControlButtons() {
-        // Nút X: Hủy bỏ preview và đóng sheet
         binding.btnClose.setOnClickListener {
             (activity as? EditorActivity)?.cancelPendingAction()
             dismiss()
         }
 
-        // Nút V: Xác nhận Action đang preview và đóng sheet
         binding.btnConfirm.setOnClickListener {
             (activity as? EditorActivity)?.confirmPendingAction()
             dismiss()
@@ -85,13 +87,11 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
     private fun setupFilterGrid() {
         binding.rvGrid.layoutManager = GridLayoutManager(requireContext(), 4)
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.filterPreviews.collect { filters ->
                 if (filters.isNotEmpty()) {
-                    // Khi nhấn vào item: Chỉ gọi callback để Activity hiện preview
-                    // KHÔNG gọi dismiss() ở đây
                     val adapter = GenericGridAdapter(filters) { filter ->
+                        // Filter vẫn chỉ Preview, chờ nhấn V mới Confirm
                         onItemSelected?.invoke(filter.id)
                     }
                     binding.rvGrid.adapter = adapter
@@ -107,10 +107,16 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
         val allAssets = assetHelper.loadAssets("editor_assets.json")
         val displayList = allAssets[assetType] ?: emptyList()
 
-        // Tương tự Filter: Nhấn là xem thử, không đóng sheet
         val adapter = GenericGridAdapter(displayList) { asset ->
-            if (asset.imageRes != null) {
-                onItemSelected?.invoke(asset.imageRes!!)
+            asset.imageRes?.let { resId ->
+                onItemSelected?.invoke(resId)
+
+                // NẾU LÀ STICKER: Confirm và đóng ngay lập tức
+                if (assetType == "stickers") {
+                    (activity as? EditorActivity)?.confirmPendingAction()
+                    dismiss()
+                }
+                // NẾU LÀ FRAME: Chỉ hiện preview (vì nút V vẫn hiện để người dùng nhấn)
             }
         }
         binding.rvGrid.adapter = adapter
@@ -121,10 +127,10 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
         super.onDestroyView()
         _binding = null
     }
+
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        // Khi người dùng nhấn ra ngoài hoặc nhấn nút Back hệ thống để tắt Sheet
-        // Chúng ta coi đó là hành động Hủy Preview
+        // Nếu thoát bằng cách nhấn ra ngoài mà không nhấn V, hãy hủy preview (cho Filter/Frame)
         (activity as? EditorActivity)?.cancelPendingAction()
     }
 }

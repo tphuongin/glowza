@@ -20,7 +20,8 @@ sealed class EditorAction(val priority: Long) {
 
     class Sticker(
         val sticker: Bitmap,
-        val matrix: Matrix
+        val matrix: Matrix,
+        val id: Long = System.currentTimeMillis()
     ): EditorAction(priority = 2)
 
     class Frame( val frame: Bitmap): EditorAction(priority = 3)

@@ -33,7 +33,7 @@ class AssetHelper @Inject constructor(@ApplicationContext private val context: C
                 val obj = array.getJSONObject(i)
 
                 // Lấy resource ID từ tên string trong JSON
-                val previewId = getResId(obj.getString("preview_icon"))
+                val previewId = getResId(obj.getString("res_name"))
                 val mainId = if (obj.has("res_name")) getResId(obj.getString("res_name")) else obj.getInt("id")
 
                 list.add(AppAsset(
