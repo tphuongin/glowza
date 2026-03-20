@@ -4,6 +4,7 @@ import androidx.camera.core.CameraSelector
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.face.Face
 import com.sgroupmobile.glowza.base.BaseViewModel
+import com.sgroupmobile.glowza.common.enums.CameraMode
 import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.repository.CameraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,8 @@ import javax.inject.Inject
 class CameraViewModel @Inject constructor(
     private val repository: CameraRepository
 ): BaseViewModel() {
+    private val _cameraMode = MutableStateFlow(CameraMode.PHOTO)
+    val cameraMode: StateFlow<CameraMode> = _cameraMode.asStateFlow()
     private val _isFaceFilterOn = MutableStateFlow(false)
     val isFaceFilterOn = _isFaceFilterOn.asStateFlow()
 
@@ -35,6 +38,10 @@ class CameraViewModel @Inject constructor(
     // Kích thước nguồn ảnh để scale tọa độ vẽ
     var imageSourceWidth = 0
     var imageSourceHeight = 0
+
+    fun updateCameraMode(newMode: CameraMode){
+        _cameraMode.value = newMode
+    }
 
     // Logic chuyển đổi dữ liệu hiển thị giữa 2 Tab
     fun setFilterTab(isColorTab: Boolean, allFilters: Map<String, List<AppFilter>>) {

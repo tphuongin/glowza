@@ -26,7 +26,7 @@ class CameraOverlayView(context: Context, attr: AttributeSet): View(context, att
     private val gridPaint = Paint().apply {
         color = Color.WHITE
         alpha = 100
-        strokeWidth = 1f
+        strokeWidth = 2f
     }
 
     fun setFilter(filter: AppFilter?) {
