@@ -1,16 +1,17 @@
 package com.sgroupmobile.glowza.data.model
 
-data class AppAsset(
-    val id: Int,
-    val name: String,
-    val previewRes: Int,
-    val mainRes: Int,
-    val type: AssetType,
+import android.graphics.Bitmap
 
-    var scale: Float = 1.0f,
-    var opacity: Int = 255
-)
+data class AppAsset(
+    override val id: Int,
+    val mainRes: Int,
+    override var displayName: String = "",
+    val type: AssetType
+) : DisplayableItem {
+    override var imageRes: Int = mainRes
+    override var imageBitmap: Bitmap? = null
+}
 
 enum class AssetType {
-    STICKER, FRAME, FILTER
+    STICKER, FRAME
 }

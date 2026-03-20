@@ -7,6 +7,7 @@ import com.sgroupmobile.glowza.base.BaseViewModel
 import com.sgroupmobile.glowza.data.model.AppFilter
 import com.sgroupmobile.glowza.repository.CameraRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -88,23 +89,23 @@ class CameraViewModel @Inject constructor(
     }
 
     fun setRatio(value: String) {
-        launch { repository.setRatio(value) }
+        launch(Dispatchers.Default) { repository.setRatio(value) }
     }
 
     fun toggleFlash() {
-        launch { repository.setFlash(!flash.value) }
+        launch(Dispatchers.Default) { repository.setFlash(!flash.value) }
     }
 
     fun toggleGrid(value: Boolean) {
-        launch { repository.setGrid(value) }
+        launch(Dispatchers.Default) { repository.setGrid(value) }
     }
 
     fun setTimer(value: Int) {
-        launch { repository.setTimer(value) }
+        launch(Dispatchers.Default) { repository.setTimer(value) }
     }
 
     fun switchCamera() {
-        launch {
+        launch(Dispatchers.Default) {
             val isBackCamera = cameraFacing.value == CameraSelector.DEFAULT_BACK_CAMERA
             repository.setCameraFacing(!isBackCamera)
         }

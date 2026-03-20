@@ -2,6 +2,7 @@ package com.sgroupmobile.glowza.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ open class BaseViewModel : ViewModel() {
     protected val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     protected fun launch(
+        block1: CoroutineDispatcher,
         block: suspend CoroutineScope.() -> Unit
     ) {
         viewModelScope.launch {

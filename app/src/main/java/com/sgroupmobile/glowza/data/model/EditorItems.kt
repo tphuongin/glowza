@@ -1,4 +1,4 @@
-package com.sgroupmobile.glowza.ui.photo_editor
+package com.sgroupmobile.glowza.data.model
 
 
 import android.graphics.Bitmap

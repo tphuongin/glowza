@@ -7,7 +7,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.sgroupmobile.glowza.base.BaseItem
-import com.sgroupmobile.glowza.ui.photo_editor.DrawItem
+import com.sgroupmobile.glowza.data.model.DrawItem
 
 class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var baseBitmap: Bitmap? = null
@@ -181,5 +181,29 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
         invalidate()
         return true
+    }
+    /**
+     * Xóa vật thể (Sticker/Text) cuối cùng vừa được thêm vào.
+     * Dùng để hủy bỏ lệnh Preview khi người dùng nhấn nút X.
+     */
+    fun removeLastItemIfPending() {
+        if (items.isNotEmpty()) {
+            items.removeAt(items.size - 1)
+            selectedItem = items.lastOrNull() // Chọn vật thể áp chót (nếu có)
+            invalidate()
+        }
+    }
+
+    /**
+     * Xóa toàn bộ Filter và Adjustment tạm thời trên View.
+     * Trả ảnh về trạng thái render gần nhất từ Stack.
+     */
+    fun resetPreviewFilters() {
+        this.filterMatrix = null
+        this.brightness = 0f
+        this.contrast = 1f
+        this.saturation = 1f
+        updateBasePaintFilter()
+        invalidate()
     }
 }

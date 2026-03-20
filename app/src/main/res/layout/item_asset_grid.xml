@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="6dp"
+    android:layout_margin="4dp"
     app:cardBackgroundColor="@color/surfaceVariant"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
@@ -17,7 +17,7 @@
             android:id="@+id/ivAssetThumb"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:padding="12dp"
+            android:padding="10dp"
             android:scaleType="fitCenter"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintTop_toTopOf="parent"
@@ -33,6 +33,18 @@
             app:layout_constraintBottom_toBottomOf="@id/ivAssetThumb"
             app:layout_constraintStart_toStartOf="@id/ivAssetThumb"
             app:layout_constraintEnd_toEndOf="@id/ivAssetThumb" />
+        <TextView
+            android:id="@+id/tv_filter_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Original"
+            app:layout_constraintTop_toBottomOf="@id/ivAssetThumb"
+            android:textColor="@color/onBackground"
+            android:textSize="@dimen/content_text" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,20 +1,51 @@
 package com.sgroupmobile.glowza.ui.photo_editor.adapter
 
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.color.MaterialColors
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.data.model.AppAsset
+import com.sgroupmobile.glowza.data.model.DisplayableItem
 import com.sgroupmobile.glowza.databinding.ItemAssetGridBinding
 
 class GenericGridAdapter(
-    private val items: List<AppAsset>,
-    private val onItemClick: (AppAsset) -> Unit
+    private val items: List<DisplayableItem>,
+    private val onItemClick: (DisplayableItem) -> Unit
 ) : RecyclerView.Adapter<GenericGridAdapter.AssetViewHolder>() {
 
-    inner class AssetViewHolder(val binding: ItemAssetGridBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class AssetViewHolder(val binding: ItemAssetGridBinding) : RecyclerView.ViewHolder(binding.root){
+        fun onBind(position: Int){
+            val item = items[position]
+            if(item.imageBitmap != null ){
+                binding.tvFilterName.visibility = View.VISIBLE
+                binding.tvFilterName.text = item.displayName
+                binding.root.setCardBackgroundColor(Color.TRANSPARENT)
+            } else{
+                binding.tvFilterName.visibility = View.GONE
+                val color = MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorSurfaceVariant)
+                binding.root.setCardBackgroundColor(color)
+            }
+
+
+            val dataToLoad: Any? = item.imageBitmap ?: item.imageRes
+
+            Glide.with(binding.root)
+                .load(dataToLoad)
+                .placeholder(R.drawable.bg_filter_item_selected)
+                .error(R.drawable.ic_crop) // Nếu lỗi ảnh nó sẽ hiện icon Crop để bạn biết
+                .into(binding.ivAssetThumb)
+
+            itemView.setOnClickListener { onItemClick(item) }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetViewHolder {
         val binding = ItemAssetGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -22,18 +53,7 @@ class GenericGridAdapter(
     }
 
     override fun onBindViewHolder(holder: AssetViewHolder, position: Int) {
-        val item = items[position]
-
-        // Log để kiểm tra từng item khi vẽ
-        Log.d("GLOWZA_CHECK", "Binding item: ${item.name} với ID: ${item.previewRes}")
-
-        Glide.with(holder.itemView.context)
-            .load(item.previewRes)
-            .placeholder(R.drawable.bg_filter_item_selected)
-            .error(R.drawable.ic_crop) // Nếu lỗi ảnh nó sẽ hiện icon Crop để bạn biết
-            .into(holder.binding.ivAssetThumb)
-
-        holder.itemView.setOnClickListener { onItemClick(item) }
+        holder.onBind(position)
     }
 
     override fun getItemCount() = items.size

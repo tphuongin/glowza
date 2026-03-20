@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.sgroupmobile.glowza.databinding.LayoutSubToolTextBinding
-import com.sgroupmobile.glowza.ui.photo_editor.TextItem
+import com.sgroupmobile.glowza.data.model.TextItem
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.ColorAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.FontAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.TemplateAdapter

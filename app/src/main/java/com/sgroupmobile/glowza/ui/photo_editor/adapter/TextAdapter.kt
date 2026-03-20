@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sgroupmobile.glowza.R
-import com.sgroupmobile.glowza.ui.photo_editor.TextItem
+import com.sgroupmobile.glowza.data.model.TextItem
 
 // 1. Adapter cho Màu sắc
 class ColorAdapter(val colors: List<String>, val onClick: (String) -> Unit) :
