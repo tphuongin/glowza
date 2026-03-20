@@ -22,10 +22,10 @@
   ],
   "frames": [
     { "id": 301, "name": "Circle", "res_name": "frame_circle" },
-    { "id": 302, "name": "Clipart", "res_name": "frame_clipart" },
+    { "id": 302, "name": "Basic", "res_name": "frame_basic" },
     { "id": 303, "name": "Color", "res_name": "frame_color" },
     { "id": 304, "name": "Cute", "res_name": "frame_cute" },
-    { "id": 305, "name": "Instagram", "res_name": "frame_instagram" },
+    { "id": 305, "name": "Purple", "res_name": "frame_purple" },
     { "id": 306, "name": "Scrapbook", "res_name": "frame_scrapbook" }
   ]
 }

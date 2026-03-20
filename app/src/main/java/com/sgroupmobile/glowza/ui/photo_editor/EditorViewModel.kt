@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.net.Uri
 import com.sgroupmobile.glowza.base.BaseViewModel
@@ -18,12 +19,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import androidx.core.graphics.scale
 import com.sgroupmobile.glowza.util.FilterUtils
 import androidx.core.graphics.createBitmap
+import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import com.sgroupmobile.glowza.base.BaseItem
 import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.io.File
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
@@ -39,7 +44,8 @@ class EditorViewModel @Inject constructor(
     val filterPreviews = _filterPreviews.asStateFlow()
     private val _itemList = MutableStateFlow<List<BaseItem>>(emptyList())
     val itemList = _itemList.asStateFlow()
-
+    private val _exportStatus = MutableStateFlow<Uri?>(null)
+    val exportStatus = _exportStatus.asStateFlow()
     private val _currentTool = MutableStateFlow<ToolType?>(null)
     val currentTool = _currentTool.asStateFlow()
 
@@ -47,7 +53,7 @@ class EditorViewModel @Inject constructor(
     val currentUri = _currentUri.asStateFlow()
 
     // Stack quản lý Undo/Redo
-    private val undoStack = mutableListOf<EditorAction>()
+    private var undoStack = mutableListOf<EditorAction>()
     private val redoStack = mutableListOf<EditorAction>()
 
     private val _navigationState = MutableStateFlow(
@@ -61,29 +67,77 @@ class EditorViewModel @Inject constructor(
     data class NavigationState(val canUndo: Boolean, val canRedo: Boolean)
 
     fun loadImage(uri: Uri) {
-        clearFilterPreviews()
         _currentUri.value = uri
-        launch(Dispatchers.Default) {
+        launch(Dispatchers.IO) {
             updateLoading()
-            val bitmap = withContext(Dispatchers.IO) {
-                try {
-                    val inputStream = application.contentResolver.openInputStream(uri)
-                    BitmapFactory.decodeStream(inputStream).also { inputStream?.close() }
-                } catch (e: Exception) {
-                    null
+            try {
+                // Đọc kích thước thật của file
+                val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                application.contentResolver.openInputStream(uri)?.use {
+                    BitmapFactory.decodeStream(it, null, options)
                 }
+
+                //Tính toán SampleSize để giảm ngay từ khi đọc file
+                val reqSize = 1600
+                options.inSampleSize = calculateInSampleSize(options, reqSize, reqSize)
+                options.inJustDecodeBounds = false
+
+                //Load ảnh đã scale lần 1 vào RAM
+                var loadedBitmap = application.contentResolver.openInputStream(uri)?.use {
+                    BitmapFactory.decodeStream(it, null, options)
+                }
+
+                // Ép nó về đúng ngưỡng an toàn
+                loadedBitmap = loadedBitmap?.let {
+                    val scaled = scaleBitmapWithLimit(it, reqSize.toFloat())
+                    //giải phóng cái cũ
+                    if (scaled != it) it.recycle()
+                    scaled
+                }
+
+                withContext(Dispatchers.Main) {
+                    originalBitmap?.recycle()
+
+                    originalBitmap = loadedBitmap
+                    loadedBitmap?.let {
+                        editorEngine = EditorEngine(it)
+                        _previewBitmap.value = it
+                    }
+                    updateLoading()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            originalBitmap = bitmap
-            bitmap?.let { editorEngine = EditorEngine(it) }
-            _previewBitmap.value = bitmap
-            updateLoading()
         }
     }
 
-    // Thêm thao tác mới
+    private fun scaleBitmapWithLimit(src: Bitmap, maxLimit: Float): Bitmap {
+        val width = src.width
+        val height = src.height
+        val maxSide = Math.max(width, height)
+        if (maxSide <= maxLimit) return src
+
+        val scale = maxLimit / maxSide
+        val matrix = Matrix().apply { postScale(scale, scale) }
+        return Bitmap.createBitmap(src, 0, 0, width, height, matrix, true)
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val (height: Int, width: Int) = options.outHeight to options.outWidth
+        var inSampleSize = 1
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
+    }
+
     fun addAction(action: EditorAction) {
         undoStack.add(action)
-        redoStack.clear() // Khi có action mới, không thể Redo các bước cũ
+        redoStack.clear()
         renderImage()
     }
 
@@ -105,26 +159,66 @@ class EditorViewModel @Inject constructor(
         }
     }
 
+    fun removeItemById(targetId: Long) {
+        _itemList.update { currentList ->
+            currentList.filter { it.id != targetId }
+        }
+
+        val iterator = undoStack.iterator()
+        while (iterator.hasNext()) {
+            val action = iterator.next()
+            if (action is EditorAction.Sticker && action.id == targetId) {
+                iterator.remove()
+                break
+            } else if (action is EditorAction.Text && action.id == targetId) {
+                iterator.remove()
+                break
+            }
+        }
+        renderImage()
+    }
     fun addNewItem(item: BaseItem) {
         _itemList.value += item
+    }
+    fun updateTextAction(item: TextItem, displayMatrix: Matrix) {
+        val index = undoStack.indexOfLast { it is EditorAction.Text && it.id == item.id }
+
+        if (index != -1) {
+            val updatedAction = EditorAction.Text(
+                text = item.text,
+                matrix = Matrix(item.matrix),
+                textPaint = Paint(item.textPaint),
+                id = item.id,
+                displayMatrix = Matrix(displayMatrix)
+            )
+
+            undoStack[index] = updatedAction
+        }
     }
 
     fun redo() {
         if (redoStack.isNotEmpty()) {
             val action = redoStack.removeAt(redoStack.lastIndex)
             undoStack.add(action)
-            if (action is EditorAction.Sticker) {
-                val item = StickerItem(action.sticker).apply {
-                    this.matrix.set(action.matrix)
-                    this.bitmap = action.sticker
+
+            when (action) {
+                is EditorAction.Sticker -> {
+                    val item = StickerItem(action.sticker).apply {
+                        this.id = action.id
+                        this.matrix.set(action.matrix)
+                    }
+                    addNewItem(item)
                 }
-                addNewItem(item)
-            } else if (action is EditorAction.Text) {
-                val item = TextItem(action.text).apply {
-                    this.matrix = action.matrix
-                    this.text = action.text
+                is EditorAction.Text -> {
+                    val item = TextItem(action.text).apply {
+                        this.id = action.id
+                        this.matrix.set(action.matrix)
+                        this.text = action.text
+                        this.textPaint.set(action.textPaint)
+                    }
+                    addNewItem(item)
                 }
-                addNewItem(item)
+                else -> {  }
             }
             renderImage()
         }
@@ -132,7 +226,6 @@ class EditorViewModel @Inject constructor(
 
 
     fun prepareFilterPreviews() {
-        // Lấy ảnh hiện tại đang hiển thị (đã có thể qua Crop/Sticker...)
         val originalBitmap = originalBitmap ?: return
 
         launch(Dispatchers.Default) {
@@ -147,7 +240,6 @@ class EditorViewModel @Inject constructor(
             filters.forEach { filter ->
                 filter.imageBitmap = applyFilterToThumbnail(thumbnail, filter.colorMatrix)
             }
-
             // Bước 4: Cập nhật Flow để Fragment nhận được dữ liệu
             _filterPreviews.value = filters
         }
@@ -199,7 +291,6 @@ class EditorViewModel @Inject constructor(
             }
             _previewBitmap.value = result
 
-            // SỬA TẠI ĐÂY: Lấy giá trị thực tế của Stack
             _navigationState.value = NavigationState(
                 canUndo = undoStack.isNotEmpty(),
                 canRedo = redoStack.isNotEmpty()
@@ -207,7 +298,6 @@ class EditorViewModel @Inject constructor(
         }
     }
 
-    // Thêm hàm dọn dẹp khi load ảnh mới hoàn toàn
     fun clearAllActions() {
         undoStack.clear()
         redoStack.clear()
@@ -220,5 +310,39 @@ class EditorViewModel @Inject constructor(
 
     fun resetTool() {
         _currentTool.value = null
+    }
+
+    fun saveImage() {
+        val engine = editorEngine ?: return
+        viewModelScope.launch(Dispatchers.Default) {
+            updateLoading()
+            try {
+                // Render với isExporting = true để vẽ Sticker/Text
+                val finalBitmap = engine.render(undoStack, isExporting = true)
+
+                // Lưu vào file tạm
+                val cacheFile = File(application.cacheDir, "temp_export.jpg")
+                application.contentResolver.openOutputStream(cacheFile.toUri())?.use {
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                }
+
+                // Gọi hàm util
+                val galleryUri = com.sgroupmobile.glowza.util.saveImageToGallery(
+                    application,
+                    cacheFile.toUri(),
+                    "Glowza_${System.currentTimeMillis()}"
+                )
+
+                withContext(Dispatchers.Main) {
+                    _exportStatus.value = galleryUri
+                    updateLoading()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _exportStatus.value = null
+                    updateLoading()
+                }
+            }
+        }
     }
 }

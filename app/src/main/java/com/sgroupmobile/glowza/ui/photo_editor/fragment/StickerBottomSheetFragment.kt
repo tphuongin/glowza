@@ -14,7 +14,7 @@ import com.sgroupmobile.glowza.common.enums.Constants.ARG_TITLE
 import com.sgroupmobile.glowza.common.enums.Constants.ARG_TYPE
 import com.sgroupmobile.glowza.databinding.LayoutBottomSheetGridBinding
 import com.sgroupmobile.glowza.helper.AssetHelper
-import com.sgroupmobile.glowza.ui.photo_editor.EditorActivity
+import com.sgroupmobile.glowza.ui.photo_editor.activity.EditorActivity
 import com.sgroupmobile.glowza.ui.photo_editor.EditorViewModel
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.GenericGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,7 +58,6 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
         binding.tvSheetTitle.text = title
 
-        // CHỈ ẨN NÚT NẾU LÀ STICKER
         if (assetType == "stickers") {
             binding.btnClose.visibility = View.GONE
             binding.btnConfirm.visibility = View.GONE
@@ -69,10 +68,8 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
         } else {
             setupAssetGrid(assetType)
         }
-
         setupControlButtons()
     }
-
     private fun setupControlButtons() {
         binding.btnClose.setOnClickListener {
             (activity as? EditorActivity)?.cancelPendingAction()
@@ -84,14 +81,12 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
             dismiss()
         }
     }
-
     private fun setupFilterGrid() {
         binding.rvGrid.layoutManager = GridLayoutManager(requireContext(), 4)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.filterPreviews.collect { filters ->
                 if (filters.isNotEmpty()) {
                     val adapter = GenericGridAdapter(filters) { filter ->
-                        // Filter vẫn chỉ Preview, chờ nhấn V mới Confirm
                         onItemSelected?.invoke(filter.id)
                     }
                     binding.rvGrid.adapter = adapter
@@ -111,12 +106,10 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
             asset.imageRes?.let { resId ->
                 onItemSelected?.invoke(resId)
 
-                // NẾU LÀ STICKER: Confirm và đóng ngay lập tức
                 if (assetType == "stickers") {
                     (activity as? EditorActivity)?.confirmPendingAction()
                     dismiss()
                 }
-                // NẾU LÀ FRAME: Chỉ hiện preview (vì nút V vẫn hiện để người dùng nhấn)
             }
         }
         binding.rvGrid.adapter = adapter
@@ -130,7 +123,6 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        // Nếu thoát bằng cách nhấn ra ngoài mà không nhấn V, hãy hủy preview (cho Filter/Frame)
         (activity as? EditorActivity)?.cancelPendingAction()
     }
 }

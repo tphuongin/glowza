@@ -1,7 +1,6 @@
 package com.sgroupmobile.glowza.ui.photo_editor.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,15 +11,10 @@ import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.common.enums.AdjustType
 import com.sgroupmobile.glowza.data.model.AdjustmentItem
 import com.sgroupmobile.glowza.databinding.LayoutSubToolAdjustmentBinding
-import com.sgroupmobile.glowza.ui.photo_editor.EditorActivity
-import com.sgroupmobile.glowza.ui.photo_editor.EditorViewModel
+import com.sgroupmobile.glowza.ui.photo_editor.activity.EditorActivity
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.AdjustmentAdapter
-import kotlin.getValue
 
 class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>() {
-    private val viewModel: EditorViewModel by activityViewModels()
-
-
     private var adjustItems: List<AdjustmentItem> = emptyList()
     private var currentActiveItem: AdjustmentItem? = null
     private var isConfirmed = false
@@ -36,7 +30,6 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         setupListeners()
-        Log.d("Glowza_Debug", "Fragment đã sẵn sàng với ${adjustItems.size} items")
     }
 
     override fun initData() {
@@ -53,7 +46,6 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
         updateSlider()
 
         binding.rvAdjustOptions.apply {
-            // Dùng 3 cột để căn giữa 3 icon tuyệt đối
             layoutManager = GridLayoutManager(requireContext(), 3)
             adapter = AdjustmentAdapter(adjustItems) { selected ->
                 currentActiveItem = selected
@@ -61,8 +53,6 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
             }
         }
     }
-
-    // Trong AdjustmentSubToolFragment.kt
 
     override fun setupListeners() {
         binding.sliderAdjust.addOnChangeListener { _, value, fromUser ->
@@ -73,7 +63,7 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
         }
 
         binding.btnCancelAdjust.setOnClickListener {
-            it.isEnabled = false // Vô hiệu hóa nút ngay lập tức để tránh click đúp
+            it.isEnabled = false
             val act = (activity as? EditorActivity)
             act?.cancelPendingAction()
             act?.closeSubTool()
@@ -90,10 +80,7 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
 
     override fun onDestroyView() {
         val act = (activity as? EditorActivity)
-        Log.d("Glowza_Logic", "Fragment: onDestroyView chạy. isConfirmed = $isConfirmed, pending = ${act?.getPendingAction()}")
-
         if (!isConfirmed && act?.getPendingAction() != null) {
-            Log.d("Glowza_Logic", "Fragment: Tự động hủy preview vì thoát tool mà chưa nhấn V")
             act.cancelPendingAction()
         }
         super.onDestroyView()

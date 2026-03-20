@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardPreview"
+        android:layout_width="260dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="60dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivFinishedImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/photo_editor" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Tuyệt vời! Ảnh đã được lưu."
+        android:textColor="@color/onSurface"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardPreview" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_home"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="32dp"
+        android:text="Về trang chủ"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/primary"
+        app:cornerRadius="28dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvStatus" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBackToGallery"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="16dp"
+        android:text="Chỉnh sửa ảnh tiếp theo"
+        android:textAllCaps="false"
+        android:textColor="@color/primary"
+        app:cornerRadius="28dp"
+        app:strokeColor="@color/primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_home" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chia sẻ lên mạng xã hội"
+            android:textColor="@color/onSurfaceVariant"
+            android:textSize="14sp" />
+
+            <ImageButton
+                android:id="@+id/btn_share"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_circle_icon"
+                android:src="@drawable/ic_share" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

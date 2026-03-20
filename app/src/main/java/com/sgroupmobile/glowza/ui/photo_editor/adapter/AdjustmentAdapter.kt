@@ -1,6 +1,5 @@
 package com.sgroupmobile.glowza.ui.photo_editor.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -17,7 +16,6 @@ class AdjustmentAdapter(
     inner class ViewHolder(val binding: ItemAdjustmentOptionBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Log.d("Glowza_Debug", "Adapter: Đang tạo ViewHolder")
         val binding = ItemAdjustmentOptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
@@ -27,7 +25,6 @@ class AdjustmentAdapter(
         val context = holder.itemView.context
 
         holder.binding.apply {
-            // Đồng bộ với ID snake_case trong XML: tv_adjust_name, iv_adjust_icon
             tvAdjustName.text = item.name
             ivAdjustIcon.setImageResource(item.icon)
 

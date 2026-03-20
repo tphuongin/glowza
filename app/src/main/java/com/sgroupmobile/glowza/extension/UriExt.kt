@@ -6,9 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import java.io.InputStream
 
-/**
- * Extension giúp chuyển đổi Uri thành Bitmap một cách an toàn.
- */
+
 fun Uri.toBitmap(context: Context): Bitmap? {
     return try {
         val inputStream: InputStream? = context.contentResolver.openInputStream(this)

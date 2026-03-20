@@ -4,24 +4,27 @@ import android.graphics.Bitmap
 import android.graphics.ColorMatrix
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Path
 
-sealed class EditorAction(val priority: Long) {
+sealed class EditorAction(val priority: Int) {
+
     val timestamp: Long = System.currentTimeMillis()
     class Crop(
         val croppedBitmap: Bitmap?
     ): EditorAction(priority = 0)
 
     class Text(
-        val text: String,
+        var text: String,
         val matrix: Matrix,
-        val textPaint: Paint
+        val textPaint: Paint,
+        var id: Long = System.currentTimeMillis(),
+        val displayMatrix: Matrix
     ): EditorAction(priority = 2)
 
     class Sticker(
         val sticker: Bitmap,
         val matrix: Matrix,
-        val id: Long = System.currentTimeMillis()
+        var id: Long = System.currentTimeMillis(),
+        val displayMatrix: Matrix
     ): EditorAction(priority = 2)
 
     class Frame( val frame: Bitmap): EditorAction(priority = 3)
@@ -29,8 +32,8 @@ sealed class EditorAction(val priority: Long) {
     class Filter(val colorMatrix: ColorMatrix): EditorAction(priority = 1)
 
     class Draw(
-        val path: Path,
-        val drawPaint: Paint
+        val paths: List<DrawItem>,
+        val displayMatrix: Matrix
     ): EditorAction(priority = 2)
 
     data class Adjustment(

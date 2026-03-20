@@ -1,18 +1,13 @@
 package com.sgroupmobile.glowza.ui.photo_editor.adapter
 
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.color.MaterialColors
 import com.sgroupmobile.glowza.R
-import com.sgroupmobile.glowza.data.model.AppAsset
 import com.sgroupmobile.glowza.data.model.DisplayableItem
 import com.sgroupmobile.glowza.databinding.ItemAssetGridBinding
 
@@ -33,14 +28,12 @@ class GenericGridAdapter(
                 val color = MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorSurfaceVariant)
                 binding.root.setCardBackgroundColor(color)
             }
-
-
             val dataToLoad: Any? = item.imageBitmap ?: item.imageRes
 
             Glide.with(binding.root)
                 .load(dataToLoad)
                 .placeholder(R.drawable.bg_filter_item_selected)
-                .error(R.drawable.ic_crop) // Nếu lỗi ảnh nó sẽ hiện icon Crop để bạn biết
+                .error(R.drawable.ic_crop)
                 .into(binding.ivAssetThumb)
 
             itemView.setOnClickListener { onItemClick(item) }

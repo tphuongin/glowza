@@ -7,7 +7,7 @@ import androidx.core.graphics.createBitmap
 
 class EditorEngine(private val original: Bitmap) {
 
-    fun render(actions: List<EditorAction>): Bitmap {
+    fun render(actions: List<EditorAction>, isExporting: Boolean = false): Bitmap {
         if (actions.isEmpty()) return original.copy(Bitmap.Config.ARGB_8888, true)
 
         val sortedActions = actions.sortedWith(
@@ -26,7 +26,6 @@ class EditorEngine(private val original: Bitmap) {
                     resultBitmap = applyFilter(resultBitmap, action.colorMatrix)
                 }
 
-                // --- BỔ SUNG: XỬ LÝ ADJUSTMENT ---
                 is EditorAction.Adjustment -> {
                     resultBitmap = applyAdjustments(
                         resultBitmap,
@@ -37,29 +36,61 @@ class EditorEngine(private val original: Bitmap) {
                 }
 
                 is EditorAction.Sticker -> {
-//                    val canvas = Canvas(resultBitmap)
-//                    // Vẽ sticker bằng Matrix chính xác mà người dùng đã kéo ở EditorView
-//                    canvas.drawBitmap(action.sticker, action.matrix, null)
+                    // chỉ vẽ khi lưu ảnh
+                    if (isExporting) {
+                        val canvas = Canvas(resultBitmap)
+                        val invertMatrix = Matrix()
+                        action.displayMatrix.invert(invertMatrix)
+
+                        canvas.withSave {
+                            concat(invertMatrix) // Đưa về hệ tọa độ ảnh gốc
+                            concat(action.matrix) // Áp dụng vị trí của sticker
+                            canvas.drawBitmap(action.sticker, 0f, 0f, null)
+                        }
+                    }
                 }
 
                 is EditorAction.Text -> {
-                    val canvas = Canvas(resultBitmap)
-                    canvas.withSave {
-                        concat(action.matrix)
-                        // Giả sử textPaint đã được setup màu sắc và kích thước
-                        canvas.drawText(action.text, 0f, 0f, action.textPaint)
+                    // chỉ vẽ khi lưu ảnh
+                    if (isExporting) {
+                        val canvas = Canvas(resultBitmap)
+                        val invertMatrix = Matrix()
+                        action.displayMatrix.invert(invertMatrix)
+
+                        canvas.withSave {
+                            concat(invertMatrix)
+                            concat(action.matrix)
+
+                            // Căn chỉnh Baseline cho Text để không bị lệch lề
+                            val fontMetrics = action.textPaint.fontMetrics
+                            canvas.drawText(action.text, 0f, -fontMetrics.ascent, action.textPaint)
+                        }
                     }
                 }
 
                 is EditorAction.Draw -> {
                     val canvas = Canvas(resultBitmap)
-                    canvas.drawPath(action.path, action.drawPaint)
+                    val invertMatrix = Matrix()
+                    action.displayMatrix.invert(invertMatrix)
+
+                    canvas.withSave {
+                        concat(invertMatrix)
+
+                        val layerRect = RectF(0f, 0f, resultBitmap.width.toFloat(), resultBitmap.height.toFloat())
+                        val drawingLayer = canvas.saveLayer(layerRect, null)
+
+                        for (drawItem in action.paths) {
+                            canvas.drawPath(drawItem.path, drawItem.paint)
+                        }
+
+                        canvas.restoreToCount(drawingLayer)
+                    }
                 }
 
                 is EditorAction.Frame -> {
                     val canvas = Canvas(resultBitmap)
-                    val destRect = Rect(0, 0, resultBitmap.width, resultBitmap.height)
-                    canvas.drawBitmap(action.frame, null, destRect, null)
+                    val fullImageRect = Rect(0, 0, resultBitmap.width, resultBitmap.height)
+                    canvas.drawBitmap(action.frame, null, fullImageRect, null)
                 }
             }
         }
@@ -76,18 +107,11 @@ class EditorEngine(private val original: Bitmap) {
         return bitmap
     }
 
-    /**
-     * Hàm xử lý Adjustment: Tính toán ma trận màu tổng hợp
-     */
     private fun applyAdjustments(source: Bitmap, b: Float, c: Float, s: Float): Bitmap {
         val bitmap = createBitmap(source.width, source.height)
         val canvas = Canvas(bitmap)
 
-        // 1. Tạo ma trận tổng hợp
         val cm = ColorMatrix()
-
-        // Áp dụng Contrast và Brightness
-        // Công thức: Color = Contrast * Color + Brightness
         val adj = ColorMatrix(floatArrayOf(
             c, 0f, 0f, 0f, b * 255f,
             0f, c, 0f, 0f, b * 255f,
@@ -96,7 +120,6 @@ class EditorEngine(private val original: Bitmap) {
         ))
         cm.postConcat(adj)
 
-        // Áp dụng Saturation
         val sat = ColorMatrix()
         sat.setSaturation(s)
         cm.postConcat(sat)

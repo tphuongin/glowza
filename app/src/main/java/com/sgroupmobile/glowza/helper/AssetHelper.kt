@@ -1,7 +1,6 @@
 package com.sgroupmobile.glowza.helper
 
 import android.content.Context
-import android.graphics.Bitmap
 import com.sgroupmobile.glowza.data.model.AppAsset
 import com.sgroupmobile.glowza.data.model.AssetType
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -42,8 +41,6 @@ class AssetHelper @Inject constructor(@ApplicationContext private val context: C
                     mainRes = previewId,
                     type = type
                 ).apply {
-                    // CẬP NHẬT CHO INTERFACE:
-                    // Sticker/Frame dùng Resource ID để hiển thị, không dùng Bitmap
                     this.imageRes = previewId
                     this.imageBitmap = null
                     this.displayName = obj.getString("name")

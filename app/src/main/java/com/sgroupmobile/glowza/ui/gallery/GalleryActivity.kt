@@ -19,7 +19,7 @@ import com.sgroupmobile.glowza.common.enums.GalleryTab
 import com.sgroupmobile.glowza.data.model.GalleryImage
 import com.sgroupmobile.glowza.databinding.ActivityGalleryBinding
 import com.sgroupmobile.glowza.helper.PermissionHelper
-import com.sgroupmobile.glowza.ui.photo_editor.EditorActivity
+import com.sgroupmobile.glowza.ui.photo_editor.activity.EditorActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

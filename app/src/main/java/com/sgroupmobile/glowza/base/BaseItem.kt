@@ -18,7 +18,7 @@ abstract class BaseItem {
     abstract fun getHeight(): Float
 
     // Trả về tọa độ 4 góc sau khi đã áp dụng Matrix (Xoay, Scale, Di chuyển)
-    fun getMappedPoints(): FloatArray {
+    open fun getMappedPoints(): FloatArray {
         val w = getWidth()
         val h = getHeight()
 

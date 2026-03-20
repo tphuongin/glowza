@@ -3,6 +3,7 @@ package com.sgroupmobile.glowza.data.model
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
@@ -31,9 +32,31 @@ class TextItem(
     init {
         updateBounds()
     }
+    private var fontMetrics: Paint.FontMetrics = textPaint.fontMetrics
 
+    override fun getMappedPoints(): FloatArray {
+        val w = getWidth()
+        val h = getHeight()
+
+        // 0,1: Top-Left | 2,3: Top-Right | 4,5: Bottom-Right | 6,7: Bottom-Left
+        boundPoints[0] = 0f; boundPoints[1] = -h-10
+        boundPoints[2] = w;  boundPoints[3] = -h-10
+        boundPoints[4] = w;  boundPoints[5] = h
+        boundPoints[6] = 0f; boundPoints[7] = h
+
+        matrix.mapPoints(_mappedPoints, boundPoints)
+        return _mappedPoints
+    }
     fun updateBounds() {
-        textPaint.getTextBounds(text, 0, text.length, bounds)
+        fontMetrics = textPaint.fontMetrics
+    }
+    fun updateText(newText: String) {
+        this.text = newText
+    }
+    // Trong class TextItem.kt
+    fun applyStyleFrom(other: TextItem) {
+        this.textPaint.set(other.textPaint)
+        this.setTextAlpha(other.textPaint.alpha)
     }
 
     // Các hàm setter để thay đổi kiểu dáng từ Sub-tool
@@ -57,13 +80,16 @@ class TextItem(
 
     override fun draw(canvas: Canvas, paint: Paint) {
         canvas.withMatrix(matrix) {
-            // Vẽ từ tọa độ (0, chiều cao bounds) để chữ không bị mất phần chân
-            drawText(text, 0f, bounds.height().toFloat(), textPaint)
+            // Vẽ chữ bắt đầu từ tọa độ y = -ascent để chữ nằm gọn trong khung (0,0)
+            drawText(text, 0f, -fontMetrics.ascent, textPaint)
         }
     }
 
-    override fun getWidth() = textPaint.measureText(text)
-    override fun getHeight() = bounds.height().toFloat() * 1.5f
+    override fun getWidth() = textPaint.measureText(text) * 1.05f
+
+    override fun getHeight(): Float {
+        return (fontMetrics.descent - fontMetrics.ascent + fontMetrics.leading)
+    }
 }
 
 class DrawItem(

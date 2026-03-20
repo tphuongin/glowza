@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.sgroupmobile.glowza.databinding.LayoutSubToolTextBinding
 import com.sgroupmobile.glowza.data.model.TextItem
+import com.sgroupmobile.glowza.provider.ColorProvider
+import com.sgroupmobile.glowza.provider.TextTemplateProvider
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.ColorAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.FontAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.TemplateAdapter
@@ -21,7 +23,6 @@ class TextSubToolFragment : Fragment() {
     private var _binding: LayoutSubToolTextBinding? = null
     private val binding get() = _binding!!
 
-    // Các Callback báo về Activity
     var onStyleUpdated: (() -> Unit)? = null
     var onTemplateSelected: ((TextItem) -> Unit)? = null
 
@@ -39,12 +40,8 @@ class TextSubToolFragment : Fragment() {
         setupLists()
     }
 
-    /**
-     * Hàm quan trọng để Activity truyền vật thể đang chọn vào Fragment
-     */
     fun setTargetItem(item: TextItem) {
         this.activeTextItem = item
-        // Cập nhật giá trị Slider theo Item hiện tại nếu View đã khởi tạo
         _binding?.let {
             it.sliderSize.value = item.textPaint.textSize.coerceIn(10f, 200f)
             it.sliderAlpha.value = item.textPaint.alpha.toFloat().coerceIn(0f, 255f)
@@ -64,7 +61,6 @@ class TextSubToolFragment : Fragment() {
     }
 
     private fun setupStyleListeners() {
-        // 1. Slider Kích thước
         binding.sliderSize.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 activeTextItem?.setTextSize(value)
@@ -72,7 +68,6 @@ class TextSubToolFragment : Fragment() {
             }
         }
 
-        // 2. Slider Độ mờ (Opacity)
         binding.sliderAlpha.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 activeTextItem?.setTextAlpha(value.toInt())
@@ -82,20 +77,13 @@ class TextSubToolFragment : Fragment() {
     }
 
     private fun setupLists() {
-        // 3. RecyclerView Màu sắc
-        val colors = listOf(
-            "#FFFFFF", "#F48FB1", "#CE93D8", "#90CAF9",
-            "#000000", "#FFEB3B", "#4CAF50", "#FF5722",
-            "#795548", "#607D8B", "#9E9E9E", "#FFC107"
-        )
+        val colors = ColorProvider.getEditorColors()
         binding.rvColors.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.rvColors.adapter = ColorAdapter(colors) { colorStr ->
             activeTextItem?.setTextColor(Color.parseColor(colorStr))
             onStyleUpdated?.invoke()
         }
 
-        // 4. RecyclerView Phông chữ
-        // Lưu ý: Đảm bảo các file .ttf nằm trong assets/fonts/
         val fonts = listOf("standard.ttf", "beauty.ttf", "bold_retro.ttf", "classic.ttf", "modern.ttf")
         binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFonts.adapter = FontAdapter(fonts) { fontPath ->
@@ -108,16 +96,16 @@ class TextSubToolFragment : Fragment() {
             }
         }
 
-        // 5. RecyclerView Mẫu (Templates)
-        val templates = listOf(
-            TextItem("Pastel").apply { setTextColor(Color.parseColor("#F48FB1")); setTextSize(50f) },
-            TextItem("Neon").apply { setTextColor(Color.CYAN); setTextSize(50f) },
-            TextItem("Shadow").apply { setTextColor(Color.BLACK); setTextSize(50f) },
-            TextItem("Soft").apply { setTextColor(Color.parseColor("#CE93D8")); setTextSize(50f) }
-        )
+        val templates = TextTemplateProvider.getTemplates(requireContext().assets)
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = TemplateAdapter(templates) { template ->
-            onTemplateSelected?.invoke(template)
+            activeTextItem?.let { current ->
+                current.applyStyleFrom(template)
+                if (template.textPaint.shader == null) {
+                    current.textPaint.shader = null
+                }
+                onStyleUpdated?.invoke()
+            }
         }
     }
 

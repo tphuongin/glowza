@@ -16,8 +16,6 @@ object ImageFilterManager {
             }
 
             "PASTEL" -> GPUImageRGBFilter(1.1f, 0.9f, 1.0f).apply {
-                // Chỉnh thông số RGB để tạo tông màu hồng phấn (Pastel)
-                // Bạn có thể tùy chỉnh thêm Brightness để ảnh sáng hơn
             }
 
             "TOON" -> GPUImageToonFilter()
