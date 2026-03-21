@@ -1,9 +1,12 @@
 package com.sgroupmobile.glowza.ui.home.fragment
 
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.common.enums.GalleryMode
@@ -18,6 +21,15 @@ import com.sgroupmobile.glowza.ui.home.adapter.ImageAdapter
 import com.sgroupmobile.glowza.ui.home.adapter.SliderAdapter
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
+    private val sliderHandler = Handler(Looper.getMainLooper())
+    private val sliderRunnable = Runnable {
+        val current = binding.viewPager.currentItem
+        val total = binding.viewPager.adapter?.itemCount ?: 0
+        if (total > 0) {
+            // Nếu đến trang cuối thì quay lại trang đầu, không thì cộng 1
+            binding.viewPager.currentItem = (current + 1) % total
+        }
+    }
 
     override fun provideBinding(
         inflater: LayoutInflater,
@@ -31,11 +43,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun setupSlider() {
-        val banners = listOf(
-            R.drawable.banner2,
-            R.drawable.banner1
-        )
+        val banners = listOf(R.drawable.banner2, R.drawable.banner1)
         binding.viewPager.adapter = SliderAdapter(banners)
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                sliderHandler.removeCallbacks(sliderRunnable)
+                sliderHandler.postDelayed(sliderRunnable, 3000)
+            }
+        })
     }
 
     private fun setupFunctionGrid() {
@@ -98,5 +115,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = ImageAdapter(ads)
         }
+    }
+    override fun onPause() {
+        super.onPause()
+        sliderHandler.removeCallbacks(sliderRunnable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sliderHandler.postDelayed(sliderRunnable, 3000)
     }
 }
