@@ -6,6 +6,8 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
@@ -19,6 +21,7 @@ import com.sgroupmobile.glowza.ui.gallery.GalleryActivity
 import com.sgroupmobile.glowza.ui.home.FunctionAdapter
 import com.sgroupmobile.glowza.ui.home.adapter.ImageAdapter
 import com.sgroupmobile.glowza.ui.home.adapter.SliderAdapter
+import kotlin.math.abs
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val sliderHandler = Handler(Looper.getMainLooper())
@@ -45,6 +48,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private fun setupSlider() {
         val banners = listOf(R.drawable.banner2, R.drawable.banner1)
         binding.viewPager.adapter = SliderAdapter(banners)
+        val compositePageTransformer = CompositePageTransformer().apply {
+            addTransformer(MarginPageTransformer(40))
+            addTransformer { page, position ->
+                val r = 1 - abs(position)
+                page.scaleY = 0.85f + r * 0.15f
+            }
+        }
+        binding.viewPager.setPageTransformer(compositePageTransformer)
 
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
