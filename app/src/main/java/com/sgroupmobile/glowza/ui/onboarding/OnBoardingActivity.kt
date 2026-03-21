@@ -1,14 +1,9 @@
 package com.sgroupmobile.glowza.ui.onboarding
 
 import android.content.Intent
-import android.os.Bundle
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.sgroupmobile.glowza.R
@@ -31,9 +26,9 @@ class OnboardingActivity : BaseActivity<ActivityOnBoardingBinding>() {
 
     override fun setupUI() {
         val items = listOf(
-            OnboardingItem(R.string.ob_title_1, R.string.ob_desc_1, R.drawable.ic_photo_collage),
-            OnboardingItem(R.string.ob_title_2, R.string.ob_desc_2, R.drawable.ic_rotate),
-            OnboardingItem(R.string.ob_title_3, R.string.ob_desc_3, R.drawable.ic_draw)
+            OnboardingItem(R.string.ob_title_1, R.string.ob_desc_1, R.drawable.onboarding1),
+            OnboardingItem(R.string.ob_title_2, R.string.ob_desc_2, R.drawable.onboarding2),
+            OnboardingItem(R.string.ob_title_3, R.string.ob_desc_3, R.drawable.onboarding3)
         )
 
         binding.viewPager.adapter = OnboardingAdapter(items)
@@ -90,7 +85,7 @@ class OnboardingActivity : BaseActivity<ActivityOnBoardingBinding>() {
                 layoutParams.width = 45 // Dấu chấm đang chọn sẽ dài ra
             } else {
                 imageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.indicator_inactive))
-                layoutParams.width = 20 // Dấu chấm còn lại hình tròn
+                layoutParams.width = 20
             }
             imageView.layoutParams = layoutParams
         }

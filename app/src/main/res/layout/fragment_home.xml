@@ -21,37 +21,20 @@
             android:layout_marginTop="-60dp"
             android:padding="12dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ảnh đã chỉnh sửa"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:padding="16dp"
-            android:textColor="@color/onBackground"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvImages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Video của bạn"
+            android:text="Khám phá ngay thôi"
             android:textStyle="bold"
             android:textSize="18sp"
             android:padding="16dp"
             android:textColor="@color/onBackground"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvVideos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvAds"
             android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/bonus_view"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>

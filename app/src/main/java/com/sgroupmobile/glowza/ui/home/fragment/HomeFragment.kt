@@ -1,14 +1,9 @@
 package com.sgroupmobile.glowza.ui.home.fragment
 
 import android.content.Intent
-import androidx.fragment.app.viewModels
-import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.common.enums.GalleryMode
@@ -17,7 +12,6 @@ import com.sgroupmobile.glowza.data.model.FunctionType
 import com.sgroupmobile.glowza.databinding.FragmentHomeBinding
 import com.sgroupmobile.glowza.provider.FunctionProvider
 import com.sgroupmobile.glowza.ui.camera.CameraActivity
-import com.sgroupmobile.glowza.ui.collage.CollageActivity
 import com.sgroupmobile.glowza.ui.gallery.GalleryActivity
 import com.sgroupmobile.glowza.ui.home.FunctionAdapter
 import com.sgroupmobile.glowza.ui.home.adapter.ImageAdapter
@@ -89,12 +83,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupAds() {
         val ads = listOf(
-            R.drawable.ic_draw,
-            R.drawable.ic_sticker
+            R.drawable.ad1,
+            R.drawable.ad2,
+            R.drawable.ad3,
+            R.drawable.ad4,
+            R.drawable.ad5,
+            R.drawable.ad6,
+            R.drawable.ad7,
+            R.drawable.ad8,
+            R.drawable.ad9,
         )
 
         binding.rvAds.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = GridLayoutManager(requireContext(), 2)
             adapter = ImageAdapter(ads)
         }
     }

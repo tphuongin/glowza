@@ -36,6 +36,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
+    override fun setupInset() {  }
+
     override fun setupUI() {
         setupBottomNav()
         binding.bottomNav.selectedItemId = R.id.nav_home
