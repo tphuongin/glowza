@@ -15,13 +15,10 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -94,9 +91,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
         setupInset(binding.btnExit, binding.rvModeCamera)
     }
 
-    override fun setupInset(topView: View, bottomView: View) {
-        super.setupInset(topView, bottomView)
-    }
 
     override fun initData() {
         filterHelper = FilterHelper(requireContext())
@@ -294,7 +288,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             // Flash Observer
             launch {
                 cameraViewModel.flash.collect { isFlashOn ->
-                    val src = if (isFlashOn) R.drawable.flash else R.drawable.no_flash
+                    val src = if (isFlashOn) R.drawable.ic_flash else R.drawable.ic_flash_off
                     binding.btnFlash.setImageResource(src)
                 }
             }

@@ -131,7 +131,7 @@
         app:layout_constraintBottom_toBottomOf="@id/btn_exit"
         app:layout_constraintEnd_toEndOf="parent"
         android:padding="@dimen/button_side_padding"
-        android:src="@drawable/setting"
+        android:src="@drawable/ic_setting"
         android:layout_marginEnd="@dimen/normal_padding"
         android:background="@android:color/transparent"/>
 
@@ -154,7 +154,7 @@
         app:layout_constraintBottom_toBottomOf="@id/btn_exit"
         app:layout_constraintEnd_toStartOf="@id/btn_switch"
         android:padding="@dimen/button_side_padding"
-        android:src="@drawable/flash"
+        android:src="@drawable/ic_flash"
         android:background="@android:color/transparent"/>
 
     <ImageButton
@@ -171,7 +171,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_filters"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:orientation="horizontal"
         android:visibility="gone"
         android:clipToPadding="false"
@@ -189,7 +189,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@id/btn_snap"
-        android:src="@drawable/face_filter"
+        android:src="@drawable/ic_face_filter"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_snap"
         app:layout_constraintEnd_toStartOf="@id/btn_snap"
@@ -202,7 +202,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/btn_snap"
         app:layout_constraintBottom_toBottomOf="@id/btn_snap"
-        android:src="@drawable/image_filter"
+        android:src="@drawable/ic_image_filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/btn_snap"
         android:padding="@dimen/button_side_padding"
