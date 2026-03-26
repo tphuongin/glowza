@@ -20,40 +20,47 @@ import com.sgroupmobile.glowza.ui.onboarding.OnboardingActivity
 import com.sgroupmobile.glowza.ui.profile.ProfileFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
+
     @Inject lateinit var settingsDataStore: SettingsDataStore
 
     override fun provideBinding() = ActivityMainBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-
         var isLoading = true
-
         splashScreen.setKeepOnScreenCondition { isLoading }
 
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
             val isFirstRun = settingsDataStore.isFirstRun.first()
+            val isDarkModeSet = settingsDataStore.isDarkMode.first()
 
+            // Nếu lần đầu, dùng chế độ hệ thống
+            val mode = if (isDarkModeSet) {
+                settingsDataStore.mode.first()
+            } else {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+
+            AppCompatDelegate.setDefaultNightMode(mode)
             isLoading = false
 
             if (isFirstRun) {
                 startActivity(Intent(this@MainActivity, OnboardingActivity::class.java))
                 finish()
             }
-            val mode = settingsDataStore.mode.first()
-            AppCompatDelegate.setDefaultNightMode(mode)
         }
     }
 
     override fun attachBaseContext(newBase: Context) {
-        val lang = kotlinx.coroutines.runBlocking {
+        val lang = runBlocking {
             val preferences = newBase.settingsDataStore.data.first()
             preferences[stringPreferencesKey("app_language")] ?: "vi"
         }
@@ -72,7 +79,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         binding.bottomNav.selectedItemId = ProfileFragment.currentTabId
     }
 
-    override fun setupInset(topView: View, bottomView: View) { }
+    override fun setupInset(topView: View, bottomView: View) {}
 
     private fun setupBottomNav() {
         binding.bottomNav.setOnItemSelectedListener { item ->
@@ -98,6 +105,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             .replace(R.id.fragment_container, fragment)
             .commit()
     }
+
     fun updateStatusBarColor(isLight: Boolean = false){
         WindowInsetsControllerCompat(window, window.decorView)
             .isAppearanceLightStatusBars = isLight

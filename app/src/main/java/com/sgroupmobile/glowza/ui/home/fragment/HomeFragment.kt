@@ -1,14 +1,10 @@
 package com.sgroupmobile.glowza.ui.home.fragment
 
 import android.content.Intent
-import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -16,7 +12,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.common.enums.GalleryMode
-import com.sgroupmobile.glowza.data.data_store.setting.SettingsDataStore
 import com.sgroupmobile.glowza.data.model.FunctionItem
 import com.sgroupmobile.glowza.data.model.FunctionType
 import com.sgroupmobile.glowza.databinding.FragmentHomeBinding
@@ -27,8 +22,6 @@ import com.sgroupmobile.glowza.ui.home.adapter.FunctionAdapter
 import com.sgroupmobile.glowza.ui.home.MainActivity
 import com.sgroupmobile.glowza.ui.home.adapter.ImageAdapter
 import com.sgroupmobile.glowza.ui.home.adapter.SliderAdapter
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlin.math.abs
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {

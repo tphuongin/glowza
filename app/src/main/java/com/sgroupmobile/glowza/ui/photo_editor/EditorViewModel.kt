@@ -345,4 +345,7 @@ class EditorViewModel @Inject constructor(
             }
         }
     }
+    fun resetExportStatus(){
+        _exportStatus.value = null
+    }
 }

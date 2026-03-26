@@ -104,6 +104,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                                 putExtra("SAVED_IMAGE_URI", it.toString())
                             }
                             startActivity(intent)
+                            viewModel.resetExportStatus()
                         }
                     }
                 }
@@ -441,7 +442,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
             }
             viewModel.addNewItem(newItem)
 
-            // CẬP NHẬT: Thêm currentDisplayMatrix vào đây để Engine không bị lỗi
+            // Thêm currentDisplayMatrix vào đây để Engine không bị lỗi
             viewModel.addAction(
                 EditorAction.Text(
                 newItem.text,

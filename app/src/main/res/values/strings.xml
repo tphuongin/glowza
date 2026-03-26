@@ -84,4 +84,16 @@
         <item>English</item>
     </string-array>
 
+    <string name="edit_more">Edit more</string>
+    <string name="back_to_gallery">Back to Gallery</string>
+    <string name="share_to">Share to</string>
+    <string name="features">Featured</string>
+
+    <string name="social_messenger">Messenger</string>
+    <string name="social_instagram">Instagram</string>
+    <string name="social_facebook">Facebook</string>
+    <string name="social_whatsapp">WhatsApp</string>
+    <string name="social_more">More</string>
+    <string name="social_tiktok">Tiktok</string>
+
 </resources>

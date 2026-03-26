@@ -83,4 +83,15 @@
         <item>Tiếng Việt</item>
         <item>Tiếng Anh</item>
     </string-array>
+
+    <string name="edit_more">Chỉnh sửa thêm</string>
+    <string name="back_to_gallery">Quay lại thư viện ảnh</string>
+    <string name="share_to">Chia sẻ lên</string>
+    <string name="features">Nổi bật</string>
+
+    <string name="social_messenger">Messenger</string>
+    <string name="social_instagram">Instagram</string>
+    <string name="social_facebook">Facebook</string>
+    <string name="social_whatsapp">WhatsApp</string>
+    <string name="social_tiktok">Tiktok</string>
 </resources>

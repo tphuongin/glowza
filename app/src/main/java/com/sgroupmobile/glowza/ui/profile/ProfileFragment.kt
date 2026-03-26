@@ -32,7 +32,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     override fun setupUI() {
         lifecycleScope.launch {
             val savedLanguage = settingsDataStore.language.first()
-            val isDarkMode = settingsDataStore.isDarkMode.first()
+            val isDarkModeSet = settingsDataStore.isDarkMode.first()
+            val isDarkMode = if (isDarkModeSet) settingsDataStore.isDarkMode.first()
+            else (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
 
             setupLanguage(savedLanguage)
             setupDarkMode(isDarkMode)
@@ -50,7 +52,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedCode = if (position == 1) "en" else "vi"
-
                 val currentAppLang = Locale.getDefault().language
 
                 if (selectedCode != currentAppLang) {
