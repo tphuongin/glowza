@@ -70,4 +70,17 @@
     <string name="next">Tiếp theo</string>
     <string name="start_now">Bắt đầu ngay</string>
     <string name="skip">Bỏ qua</string>
+
+    <string name="home">Trang chủ</string>
+    <string name="profile">Cá nhân</string>
+    <string name="explore">Khám phá ngay thôi</string>
+
+    <string name="user_name">User</string>
+    <string name="setting_dark_mode">Chế độ tối</string>
+    <string name="setting_language">Ngôn ngữ</string>
+
+    <string-array name="language_options">
+        <item>Tiếng Việt</item>
+        <item>Tiếng Anh</item>
+    </string-array>
 </resources>

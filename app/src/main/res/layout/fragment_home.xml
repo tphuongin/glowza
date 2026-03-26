@@ -1,4 +1,5 @@
 <androidx.core.widget.NestedScrollView
+    android:id="@+id/nested_scroll_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,29 +11,30 @@
         android:layout_height="wrap_content">
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="260dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvFunction"
+            android:id="@+id/rv_function"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="-60dp"
-            android:padding="12dp"/>
+            android:padding="16dp"/>
 
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Khám phá ngay thôi"
+            android:text="@string/explore"
+            android:fontFamily="@font/regular"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:padding="16dp"
+            android:paddingStart="22dp"
             android:textColor="@color/onBackground"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAds"
+            android:id="@+id/rv_ads"
             android:layout_width="match_parent"
             android:layout_marginBottom="@dimen/bonus_view"
             android:layout_height="wrap_content"/>

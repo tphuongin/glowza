@@ -1,4 +1,4 @@
-package com.sgroupmobile.glowza.ui.home
+package com.sgroupmobile.glowza.ui.home.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -50,8 +50,8 @@ class FunctionAdapter(
     inner class BigVH(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: FunctionItem) {
             val context = itemView.context
-            itemView.findViewById<TextView>(R.id.tvTitle).text = context.getString(item.nameRes)
-            itemView.findViewById<ImageView>(R.id.ivIcon).setImageResource(item.icon)
+            itemView.findViewById<TextView>(R.id.tv_title).text = context.getString(item.nameRes)
+            itemView.findViewById<ImageView>(R.id.iv_icon).setImageResource(item.icon)
             itemView.setOnClickListener {
                 onFunctionClicked(item)
             }
@@ -61,8 +61,8 @@ class FunctionAdapter(
     inner class SmallVH(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(item: FunctionItem) {
             val context = itemView.context
-            itemView.findViewById<TextView>(R.id.tvTitle).text = context.getString(item.nameRes)
-            itemView.findViewById<ImageView>(R.id.ivIcon).setImageResource(item.icon)
+            itemView.findViewById<TextView>(R.id.tv_title).text = context.getString(item.nameRes)
+            itemView.findViewById<ImageView>(R.id.iv_icon).setImageResource(item.icon)
             itemView.setOnClickListener {
                 onFunctionClicked(item)
             }

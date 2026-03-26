@@ -1,53 +1,58 @@
 package com.sgroupmobile.glowza.data.data_store.setting
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import com.sgroupmobile.glowza.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import com.sgroupmobile.glowza.R
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
-// Khởi tạo DataStore cho Settings
-val Context.settingsDataStore by preferencesDataStore(name = "settings_prefs")
 
+@Singleton
 class SettingsDataStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    companion object {
+    private object PreferencesKeys {
         val LANGUAGE = stringPreferencesKey("app_language")
         val DARK_MODE = intPreferencesKey("dark_mode")
-        val LAST_TAB = intPreferencesKey("last_tab")
         val IS_FIRST_RUN = booleanPreferencesKey("is_first_run")
     }
-    val isFirstRun: Flow<Boolean> = context.settingsDataStore.data.map { it[IS_FIRST_RUN] ?: true }
+
+    // --- READ DATA ---
+
+    val isFirstRun: Flow<Boolean> = context.settingsDataStore.data.map {
+        it[PreferencesKeys.IS_FIRST_RUN] ?: true
+    }
+    val mode: Flow<Int> = context.settingsDataStore.data.map {
+        it[PreferencesKeys.DARK_MODE] ?: AppCompatDelegate.MODE_NIGHT_NO
+    }
 
     suspend fun setFirstRunComplete() {
-        context.settingsDataStore.edit { it[IS_FIRST_RUN] = false }
+        context.settingsDataStore.edit { it[PreferencesKeys.IS_FIRST_RUN] = false }
     }
-    // Đọc Ngôn ngữ (Mặc định: Tiếng Việt)
-    val language: Flow<String> = context.settingsDataStore.data.map { it[LANGUAGE] ?: "vi" }
-
-    // Đọc Chế độ tối (Mặc định: Theo hệ thống)
-    val darkMode: Flow<Int> = context.settingsDataStore.data.map {
-        it[DARK_MODE] ?: 2 // 2 tương ứng với MODE_NIGHT_FOLLOW_SYSTEM
-    }
-    val lastTab: Flow<Int> = context.settingsDataStore.data.map {
-        it[LAST_TAB] ?: R.id.nav_home // Mặc định về Home nếu chưa lưu gì
+    val language: Flow<String> = context.settingsDataStore.data.map {
+        it[PreferencesKeys.LANGUAGE] ?: "vi"
     }
 
-    // Đọc Tab cuối cùng (Để không bị bay về Home)
+    val isDarkMode: Flow<Boolean> = context.settingsDataStore.data.map {
+        val savedMode = it[PreferencesKeys.DARK_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        if (savedMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+            val currentMode = context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+            currentMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        } else {
+            savedMode == AppCompatDelegate.MODE_NIGHT_YES
+        }
+    }
 
     suspend fun setLanguage(lang: String) {
-        context.settingsDataStore.edit { it[LANGUAGE] = lang }
+        context.settingsDataStore.edit { it[PreferencesKeys.LANGUAGE] = lang }
     }
 
     suspend fun setDarkMode(mode: Int) {
-        context.settingsDataStore.edit { it[DARK_MODE] = mode }
-    }
-
-    suspend fun setLastTab(tabId: Int) {
-        context.settingsDataStore.edit { it[LAST_TAB] = tabId }
+        context.settingsDataStore.edit { it[PreferencesKeys.DARK_MODE] = mode }
     }
 }

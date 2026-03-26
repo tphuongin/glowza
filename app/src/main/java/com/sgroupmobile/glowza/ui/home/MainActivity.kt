@@ -1,14 +1,19 @@
 package com.sgroupmobile.glowza.ui.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
 import com.sgroupmobile.glowza.data.data_store.setting.SettingsDataStore
+import com.sgroupmobile.glowza.data.data_store.setting.settingsDataStore
 import com.sgroupmobile.glowza.databinding.ActivityMainBinding
 import com.sgroupmobile.glowza.ui.home.fragment.HomeFragment
 import com.sgroupmobile.glowza.ui.onboarding.OnboardingActivity
@@ -25,23 +30,49 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun provideBinding() = ActivityMainBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+
+        var isLoading = true
+
+        splashScreen.setKeepOnScreenCondition { isLoading }
+
         super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
             val isFirstRun = settingsDataStore.isFirstRun.first()
+
+            isLoading = false
+
             if (isFirstRun) {
                 startActivity(Intent(this@MainActivity, OnboardingActivity::class.java))
                 finish()
             }
+            val mode = settingsDataStore.mode.first()
+            AppCompatDelegate.setDefaultNightMode(mode)
         }
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        val lang = kotlinx.coroutines.runBlocking {
+            val preferences = newBase.settingsDataStore.data.first()
+            preferences[stringPreferencesKey("app_language")] ?: "vi"
+        }
+
+        val locale = java.util.Locale(lang)
+        java.util.Locale.setDefault(locale)
+        val config = android.content.res.Configuration(newBase.resources.configuration)
+        config.setLocale(locale)
+        val context = newBase.createConfigurationContext(config)
+
+        super.attachBaseContext(context)
+    }
 
     override fun setupUI() {
         setupBottomNav()
-        binding.bottomNav.selectedItemId = R.id.nav_home
+        binding.bottomNav.selectedItemId = ProfileFragment.currentTabId
     }
+
+    override fun setupInset(topView: View, bottomView: View) { }
 
     private fun setupBottomNav() {
         binding.bottomNav.setOnItemSelectedListener { item ->
@@ -59,12 +90,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun replaceFragment(fragment: Fragment) {
-        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
         if (currentFragment?.javaClass == fragment.javaClass) return
 
         supportFragmentManager.beginTransaction()
             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-            .replace(R.id.fragmentContainer, fragment)
+            .replace(R.id.fragment_container, fragment)
             .commit()
+    }
+    fun updateStatusBarColor(isLight: Boolean = false){
+        WindowInsetsControllerCompat(window, window.decorView)
+            .isAppearanceLightStatusBars = isLight
     }
 }

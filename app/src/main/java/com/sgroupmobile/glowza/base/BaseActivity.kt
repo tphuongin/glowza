@@ -32,7 +32,14 @@ abstract class BaseActivity<VB: ViewBinding> : AppCompatActivity() {
     protected open fun setupInset(topView: View = binding.root, bottomView: View = binding.root){
         ViewCompat.setOnApplyWindowInsetsListener(topView) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            topView.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            val topParams = topView.layoutParams as ViewGroup.MarginLayoutParams
+            topParams.setMargins(
+                systemBars.top,
+                systemBars.top,
+                systemBars.right,
+                0
+            )
+            topView.layoutParams = topParams
             val params = bottomView.layoutParams as ViewGroup.MarginLayoutParams
             params.setMargins(
                 systemBars.left,

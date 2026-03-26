@@ -1,7 +1,5 @@
 package com.sgroupmobile.glowza.ui.profile
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,39 +12,51 @@ import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.data.data_store.setting.SettingsDataStore
 import com.sgroupmobile.glowza.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var settingsDataStore: SettingsDataStore
+
+    companion object {
+        var currentTabId: Int = R.id.nav_home
+    }
 
     override fun provideBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentProfileBinding.inflate(inflater, container, false)
 
     override fun setupUI() {
-        setupLanguage()
-        setupDarkMode()
+        lifecycleScope.launch {
+            val savedLanguage = settingsDataStore.language.first()
+            val isDarkMode = settingsDataStore.isDarkMode.first()
+
+            setupLanguage(savedLanguage)
+            setupDarkMode(isDarkMode)
+        }
     }
 
-    private fun setupLanguage() {
-        val languages = listOf("English", "Tiếng Việt")
+    private fun setupLanguage(currentSavedLang: String) {
+        val languages = resources.getStringArray(R.array.language_options)
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, languages)
         binding.spinnerLanguage.adapter = adapter
 
+        val initialPosition = if (currentSavedLang == "en") 1 else 0
+        binding.spinnerLanguage.setSelection(initialPosition, false)
+
         binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedCode = if (position == 0) "en" else "vi"
-                val currentLang = resources.configuration.locales[0].language
+                val selectedCode = if (position == 1) "en" else "vi"
 
-                if (selectedCode != currentLang) {
+                val currentAppLang = Locale.getDefault().language
+
+                if (selectedCode != currentAppLang) {
                     lifecycleScope.launch {
-                        // LƯU TAB VÀ NGÔN NGỮ TRƯỚC KHI RECREATE
-                        settingsDataStore.setLastTab(R.id.nav_profile)
+                        currentTabId = R.id.nav_profile
                         settingsDataStore.setLanguage(selectedCode)
-
                         changeLanguage(selectedCode)
                     }
                 }
@@ -55,16 +65,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
     }
 
-    private fun setupDarkMode() {
-        // Tắt listener để không bị loop khi gán giá trị khởi tạo
+    private fun setupDarkMode(isNightMode: Boolean) {
         binding.switchDark.setOnCheckedChangeListener(null)
-
-        binding.switchDark.isChecked = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
+        binding.switchDark.isChecked = isNightMode
 
         binding.switchDark.setOnCheckedChangeListener { _, isChecked ->
             val mode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             lifecycleScope.launch {
-                settingsDataStore.setLastTab(R.id.nav_profile) // Lưu tab
+                currentTabId = R.id.nav_profile
                 settingsDataStore.setDarkMode(mode)
                 AppCompatDelegate.setDefaultNightMode(mode)
             }
@@ -72,11 +80,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
     private fun changeLanguage(languageCode: String) {
-        val locale = java.util.Locale(languageCode)
-        java.util.Locale.setDefault(locale)
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
         val config = resources.configuration
         config.setLocale(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
+        requireActivity().resources.updateConfiguration(config, resources.displayMetrics)
         requireActivity().recreate()
     }
 }

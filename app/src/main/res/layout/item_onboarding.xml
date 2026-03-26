@@ -39,7 +39,7 @@
         android:text="Tiêu đề nghệ thuật"
         android:textColor="@color/primary"
         android:textSize="28sp"
-        android:paddingBottom="@dimen/normal_padding"
+        android:paddingBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/tv_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -52,7 +52,7 @@
         android:layout_marginBottom="120dp"
         android:alpha="0.8"
         android:fontFamily="@font/medium"
-        android:paddingBottom="@dimen/normal_padding"
+        android:paddingBottom="15dp"
         android:gravity="center"
         android:text="Mô tả tính"
         android:textColor="@color/onSurface"

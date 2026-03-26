@@ -8,25 +8,26 @@
     <color name="onPrimaryContainer">#F3D7EC</color>
 
     <!-- ===== SECONDARY ===== -->
-    <color name="secondary">#8FD3C7</color>
-    <color name="onSecondary">#003731</color>
-    <color name="secondaryContainer">#1E4E49</color>
-    <color name="onSecondaryContainer">#D6F3EE</color>
+    <color name="secondary">#F5F7FA</color>
+    <color name="onSecondary">#2A1A3A</color>
+
+    <color name="secondaryContainer">#CCF3D7EC</color>
+    <color name="onSecondaryContainer">#3A0F34</color>
 
     <!-- ===== TERTIARY ===== -->
-    <color name="tertiary">#F2A97E</color>
+    <color name="tertiary">#1E1E1E</color>
     <color name="onTertiary">#4A1F00</color>
     <color name="tertiaryContainer">#5B2E14</color>
     <color name="onTertiaryContainer">#FFDCC8</color>
 
     <!-- ===== BACKGROUND ===== -->
     <color name="background">#121212</color>
-    <color name="onBackground">#EAE0E8</color>
+    <color name="onBackground">#FFFFFF</color>
 
     <!-- ===== SURFACE ===== -->
     <color name="surface">#121212</color>
     <color name="onSurface">#EAE0E8</color>
-    <color name="surfaceVariant">#4F444B</color>
+    <color name="surfaceVariant">#757575</color>
     <color name="onSurfaceVariant">#D3C2CC</color>
 
     <!-- ===== OUTLINE / DIVIDER ===== -->

@@ -70,4 +70,18 @@
     <string name="next">Next</string>
     <string name="start_now">Start Now</string>
     <string name="skip">Skip</string>
+
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="explore">Let\'s try now</string>
+
+    <string name="user_name">User</string>
+    <string name="setting_dark_mode">Dark Mode</string>
+    <string name="setting_language">Language</string>
+
+    <string-array name="language_options">
+        <item>Vietnamese</item>
+        <item>English</item>
+    </string-array>
+
 </resources>
