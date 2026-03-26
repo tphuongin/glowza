@@ -40,6 +40,14 @@ abstract class BaseFragment<VB: ViewBinding> : Fragment() {
         container: ViewGroup?
     ): VB
 
+    protected open fun setupInset(topView: View = binding.root, bottomView: View = binding.root){
+        ViewCompat.setOnApplyWindowInsetsListener(topView) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            topView.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+            bottomView.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
     protected open fun setupUI() {}
     protected open fun initData() {}
     protected open fun setupObservers() {}

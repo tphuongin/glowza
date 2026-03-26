@@ -2,6 +2,7 @@ package com.sgroupmobile.glowza.ui.camera
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseActivity
 import com.sgroupmobile.glowza.databinding.ActivityCameraBinding
@@ -19,7 +20,6 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>() {
         checkPermission()
     }
 
-    override fun setupInset() {}
     private fun checkPermission() {
         permissionHelper = PermissionHelper(this, this)
         permissionHelper.requestPermission(

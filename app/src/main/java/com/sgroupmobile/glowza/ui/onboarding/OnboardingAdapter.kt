@@ -23,7 +23,8 @@ class OnboardingAdapter(private val items: List<OnboardingItem>) :
         holder.binding.apply {
             tvTitle.setText(item.titleRes)
             tvDescription.setText(item.descRes)
-            ivImage.setImageResource(item.imageRes)
+            lottie.setAnimation(item.imageRes)
+            lottie.playAnimation()
         }
     }
 

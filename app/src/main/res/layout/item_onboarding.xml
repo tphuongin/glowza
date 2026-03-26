@@ -3,15 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#66c683b9">
 
 
-    <ImageView
-        android:id="@+id/ivImage"
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/onboarding1" />
+        android:paddingBottom="100dp"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/onboarding1"/>
 
     <View
         android:layout_width="match_parent"
@@ -28,26 +30,29 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:fontFamily="sans-serif-black"
+        android:fontFamily="@font/bold"
         android:gravity="center"
         android:text="Tiêu đề nghệ thuật"
         android:textColor="@color/primary"
         android:textSize="28sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvDescription"
+        android:paddingBottom="@dimen/normal_padding"
+        app:layout_constraintBottom_toTopOf="@+id/tv_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/tvDescription"
+        android:id="@+id/tv_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
         android:layout_marginBottom="120dp"
         android:alpha="0.8"
+        android:fontFamily="@font/medium"
+        android:paddingBottom="@dimen/normal_padding"
         android:gravity="center"
         android:text="Mô tả tính"
         android:textColor="@color/onSurface"

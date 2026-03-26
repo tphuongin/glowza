@@ -1,6 +1,7 @@
 package com.sgroupmobile.glowza.ui.onboarding
 
 import android.content.Intent
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
@@ -26,9 +27,9 @@ class OnboardingActivity : BaseActivity<ActivityOnBoardingBinding>() {
 
     override fun setupUI() {
         val items = listOf(
-            OnboardingItem(R.string.ob_title_1, R.string.ob_desc_1, R.drawable.onboarding1),
-            OnboardingItem(R.string.ob_title_2, R.string.ob_desc_2, R.drawable.onboarding2),
-            OnboardingItem(R.string.ob_title_3, R.string.ob_desc_3, R.drawable.onboarding3)
+            OnboardingItem(R.string.ob_title_1, R.string.ob_desc_1, R.raw.onboarding1),
+            OnboardingItem(R.string.ob_title_2, R.string.ob_desc_2, R.raw.onboarding2),
+            OnboardingItem(R.string.ob_title_3, R.string.ob_desc_3, R.raw.onboarding3)
         )
 
         binding.viewPager.adapter = OnboardingAdapter(items)
@@ -53,6 +54,10 @@ class OnboardingActivity : BaseActivity<ActivityOnBoardingBinding>() {
                 navigateToMain()
             }
         }
+    }
+
+    override fun setupInset(topView: View, bottomView: View) {
+        super.setupInset(binding.btnSkip, binding.root)
     }
 
     override fun setupListeners() {

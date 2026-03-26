@@ -82,13 +82,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     ): FragmentCameraBinding = FragmentCameraBinding.inflate(inflater, container, false)
 
     override fun setupUI() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.btnExit) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val params = v.layoutParams as ViewGroup.MarginLayoutParams
-            params.topMargin = systemBars.top
-            v.layoutParams = params
-            insets
-        }
         binding.rvModeCamera.layoutManager = LinearLayoutManager(requireContext(),
             LinearLayoutManager.HORIZONTAL, false)
         snapHelper.attachToRecyclerView(binding.rvModeCamera)
@@ -98,6 +91,11 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
         val padding = (recyclerWidth - itemWidth) / 2
 
         binding.rvModeCamera.setPadding(padding, 0, padding, 0)
+        setupInset(binding.btnExit, binding.rvModeCamera)
+    }
+
+    override fun setupInset(topView: View, bottomView: View) {
+        super.setupInset(topView, bottomView)
     }
 
     override fun initData() {

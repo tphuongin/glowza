@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.lottie)
     implementation(libs.ucrop)
     implementation(libs.glide)
     implementation(libs.androidx.legacy.support.v4)

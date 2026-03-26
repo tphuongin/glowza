@@ -2,6 +2,7 @@ package com.sgroupmobile.glowza.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,7 +37,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    override fun setupInset() {  }
 
     override fun setupUI() {
         setupBottomNav()
