@@ -118,5 +118,11 @@
     <string name="action_cancel">HỦY</string>
     <string name="action_confirm">XÁC NHẬN</string>
     <string name="draw_title">Draw</string>
+    <string name="permission_title">Cấp quyền truy cập</string>
+    <string name="permission_message">Để sử dụng tính năng này, Glowza cần bạn cấp quyền truy cập bộ nhớ để chọn và chỉnh sửa ảnh.</string>
+
+    <string name="btn_later">Để sau</string>
+    <string name="btn_retry">Thử lại</string>
+    <string name="btn_setting">Cài đặt</string>
 
 </resources>

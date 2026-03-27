@@ -120,4 +120,10 @@
     <string name="action_confirm">CONFIRM</string>
     <string name="draw_title">Draw</string>
 
+    <string name="permission_title">Permission Required</string>
+    <string name="permission_message">To use this feature, Glowza needs access to your storage to select and edit photos.</string>
+    <string name="btn_later">Later</string>
+    <string name="btn_retry">Try Again</string>
+    <string name="btn_setting">Settings</string>
+
 </resources>
