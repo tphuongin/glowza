@@ -93,7 +93,11 @@
     <string name="social_instagram">Instagram</string>
     <string name="social_facebook">Facebook</string>
     <string name="social_whatsapp">WhatsApp</string>
-    <string name="social_more">More</string>
     <string name="social_tiktok">Tiktok</string>
+
+    <string name="dialog_exit_editor_title">Leave the editor?</string>
+    <string name="dialog_exit_editor_message">Your changes have not been saved. Are you sure you want to discard these edits?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_continue_editing">Continue</string>
 
 </resources>

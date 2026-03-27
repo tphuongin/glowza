@@ -1,5 +1,6 @@
 package com.sgroupmobile.glowza.ui.photo_editor.activity
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -8,6 +9,7 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -34,6 +36,7 @@ import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
 import com.sgroupmobile.glowza.databinding.ActivityEditorBinding
 import com.sgroupmobile.glowza.databinding.ItemTabToolBinding
+import com.sgroupmobile.glowza.databinding.LayoutDialogCustomConfirmBinding
 import com.sgroupmobile.glowza.databinding.LayoutDialogEditTextBinding
 import com.sgroupmobile.glowza.extension.toBitmap
 import com.sgroupmobile.glowza.provider.EditorToolProvider
@@ -168,7 +171,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 cancelPendingAction()
                 closeSubTool()
             } else {
-                finish()
+                confirmExit()
             }
         }
         binding.editorView.onTextItemDoubleClicked = { textItem ->
@@ -177,6 +180,29 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnRedo.setOnClickListener { viewModel.redo() }
+    }
+    private fun confirmExit() {
+        val dialogBinding = LayoutDialogCustomConfirmBinding.inflate(layoutInflater)
+
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        dialogBinding.btnStay.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnDiscard.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
     }
 
     private fun setupMainTabs() {

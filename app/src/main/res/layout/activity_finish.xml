@@ -222,7 +222,7 @@
         android:id="@+id/view_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="25dp"
         android:background="@color/tertiary"
         app:layout_constraintTop_toBottomOf="@id/layout_social_apps" />
 
