@@ -1,6 +1,7 @@
 package com.sgroupmobile.glowza.ui.photo_editor.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,6 +68,8 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
             val act = (activity as? EditorActivity)
             act?.cancelPendingAction()
             act?.closeSubTool()
+            it.isEnabled = true
+            Log.e("eeeeeeee", "cancel click ${act}")
         }
 
         binding.btnConfirmAdjust.setOnClickListener {
@@ -75,6 +78,8 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
             val act = (activity as? EditorActivity)
             act?.confirmPendingAction()
             act?.closeSubTool()
+            it.isEnabled = true
+            Log.e("eeeeeeee", "confirm click ${act}")
         }
     }
 

@@ -99,4 +99,18 @@
     <string name="dialog_exit_editor_message">Các thay đổi của bạn chưa được lưu.\nBạn chắc chắn muốn hủy bỏ các chỉnh sửa này?</string>
     <string name="action_discard">Thoát</string>
     <string name="action_continue_editing">Tiếp tục</string>
+
+    <string name="filter_grayscale">Trắng đen</string>
+    <string name="filter_sepia">Cổ điển</string>
+    <string name="filter_vintage">Vintage</string>
+    <string name="filter_cold">Lạnh</string>
+    <string name="filter_warm">Ấm áp</string>
+    <string name="filter_polaroid">Polaroid</string>
+    <string name="filter_cinematic">Điện ảnh</string>
+    <string name="filter_high_contrast">Độ tương phản</string>
+    <string name="title_choose_filter">Chọn Bộ Lọc</string>
+    <string name="title_choose_sticker">Chọn Nhãn Dán</string>
+    <string name="title_choose_frame">Chọn Khung Hình</string>
+    <string name="adjust_title">Căn chỉnh</string>
+
 </resources>

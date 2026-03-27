@@ -1,5 +1,6 @@
 package com.sgroupmobile.glowza.ui.profile
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
-    @Inject lateinit var settingsDataStore: SettingsDataStore
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
 
     companion object {
         var currentTabId: Int = R.id.nav_home
@@ -32,49 +34,65 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     override fun setupUI() {
         lifecycleScope.launch {
             val savedLanguage = settingsDataStore.language.first()
-            val isDarkModeSet = settingsDataStore.isDarkMode.first()
-            val isDarkMode = if (isDarkModeSet) settingsDataStore.isDarkMode.first()
-            else (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
-
             setupLanguage(savedLanguage)
-            setupDarkMode(isDarkMode)
         }
+
+        setupDarkMode()
     }
 
     private fun setupLanguage(currentSavedLang: String) {
         val languages = resources.getStringArray(R.array.language_options)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, languages)
+        val adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, languages)
         binding.spinnerLanguage.adapter = adapter
 
         val initialPosition = if (currentSavedLang == "en") 1 else 0
         binding.spinnerLanguage.setSelection(initialPosition, false)
 
-        binding.spinnerLanguage.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedCode = if (position == 1) "en" else "vi"
-                val currentAppLang = Locale.getDefault().language
+        binding.spinnerLanguage.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedCode = if (position == 1) "en" else "vi"
 
-                if (selectedCode != currentAppLang) {
-                    lifecycleScope.launch {
-                        currentTabId = R.id.nav_profile
-                        settingsDataStore.setLanguage(selectedCode)
-                        changeLanguage(selectedCode)
+                    val currentAppLang = Locale.getDefault().language
+
+                    if (selectedCode != currentAppLang) {
+                        lifecycleScope.launch {
+                            currentTabId = R.id.nav_profile
+                            settingsDataStore.setLanguage(selectedCode)
+                            changeLanguage(selectedCode)
+                        }
                     }
                 }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
     }
 
-    private fun setupDarkMode(isNightMode: Boolean) {
-        binding.switchDark.setOnCheckedChangeListener(null)
-        binding.switchDark.isChecked = isNightMode
+    private fun setupDarkMode() {
+        // Kiểm tra xem giao diện HIỆN TẠI đang là Dark hay Light (bất kể là do hệ thống hay do app ép buộc)
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val isCurrentlyDark = currentNightMode == Configuration.UI_MODE_NIGHT_YES
 
+        // Set trạng thái Switch cho đúng với giao diện hiện tại
+        binding.switchDark.setOnCheckedChangeListener(null)
+        binding.switchDark.isChecked = isCurrentlyDark
+
+        // Xử lý sự kiện khi user tự tay bấm Switch
         binding.switchDark.setOnCheckedChangeListener { _, isChecked ->
             val mode = if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
             lifecycleScope.launch {
                 currentTabId = R.id.nav_profile
+
+                // Lưu giá trị Int vào DataStore
                 settingsDataStore.setDarkMode(mode)
+
+                // Ép app đổi theme ngay lập tức
                 AppCompatDelegate.setDefaultNightMode(mode)
             }
         }

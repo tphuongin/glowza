@@ -3,8 +3,6 @@ package com.sgroupmobile.glowza.data.data_store.setting
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
-import com.sgroupmobile.glowza.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +26,7 @@ class SettingsDataStore @Inject constructor(
         it[PreferencesKeys.IS_FIRST_RUN] ?: true
     }
     val mode: Flow<Int> = context.settingsDataStore.data.map {
-        it[PreferencesKeys.DARK_MODE] ?: AppCompatDelegate.MODE_NIGHT_NO
+        it[PreferencesKeys.DARK_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
 
     suspend fun setFirstRunComplete() {

@@ -10,6 +10,7 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -66,7 +67,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         setupMainTabs()
         setupListeners()
         handleIntentData()
-        setupInset(binding.btnBack)
+        setupInset(binding.adjustView)
     }
 
     override fun setupObservers() {
@@ -91,7 +92,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 }
 
                 launch {
-                    viewModel.currentTool.collectLatest { type ->
+                    viewModel.currentTool.collect { type ->
                         if (type != null) {
                             handleToolChange(type)
                         } else {
@@ -168,13 +169,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
 
         binding.btnBack.setOnClickListener {
-
-            if (binding.subToolContainer.isVisible) {
-                cancelPendingAction()
-                closeSubTool()
-            } else {
-                confirmExit()
-            }
+            confirmExit()
         }
         binding.editorView.onTextItemDoubleClicked = { textItem ->
             showEditTextDialog(textItem)
@@ -209,7 +204,6 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
         dialog.show()
     }
-
     private fun setupMainTabs() {
         val tabLayout = binding.tabLayoutEditorTools
         val tools = EditorToolProvider.getPublicTools()
@@ -230,37 +224,62 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                updateTabStyle(tab, true)
                 val tool = tab?.tag as? EditorTool ?: return
+                if (pendingAction != null) {
+                    cancelPendingAction()
+                }
+
+                binding.editorView.setDrawMode(false)
+
+                updateTabStyle(tab, true)
 
                 when (tool.type) {
-                    ToolType.CROP -> showCropSubTool()
-                    ToolType.FILTER -> openAssetSheet("Chọn Bộ Lọc", "filters")
-                    ToolType.STICKER -> openAssetSheet("Chọn Nhãn Dán", "stickers")
-                    ToolType.FRAME -> openAssetSheet("Chọn Khung Hình", "frames")
-                    else -> viewModel.selectTool(tool.type)
+                    // Nhóm dùng Sheet/Activity: Phải ép ẩn khung Fragment đi
+                    ToolType.CROP, ToolType.FILTER, ToolType.STICKER, ToolType.FRAME -> {
+                        binding.subToolContainer.visibility = View.GONE
+
+                        when (tool.type) {
+                            ToolType.CROP -> showCropSubTool()
+                            ToolType.FILTER -> openAssetSheet(getString(R.string.title_choose_filter), "filters")
+                            ToolType.STICKER -> openAssetSheet(getString(R.string.title_choose_sticker), "stickers")
+                            ToolType.FRAME -> openAssetSheet(getString(R.string.title_choose_frame), "frames")
+                            else -> {}
+                        }
+                    }
+                    else -> {
+                        lifecycleScope.launch {
+                            viewModel.selectTool(tool.type)
+                        }
+                    }
                 }
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) = updateTabStyle(tab, false)
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                updateTabStyle(tab, false)
+            }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 val tool = tab?.tag as? EditorTool ?: return
-                if (tool.type == ToolType.CROP || tool.type == ToolType.FILTER ||
-                    tool.type == ToolType.STICKER || tool.type == ToolType.FRAME) {
+
+                if (tool.type in listOf(ToolType.CROP, ToolType.FILTER, ToolType.STICKER, ToolType.FRAME)) {
                     onTabSelected(tab)
                 } else {
                     if (binding.subToolContainer.isVisible) {
-                        viewModel.resetTool()
+                        cancelPendingAction()
+                        lifecycleScope.launch {
+                            viewModel.resetTool()
+                        }
                     } else {
                         binding.subToolContainer.visibility = View.VISIBLE
                         updateTabStyle(tab, true)
+                        lifecycleScope.launch {
+                            viewModel.selectTool(tool.type)
+                        }
                     }
                 }
             }
         })
     }
-
     fun getPendingAction(): EditorAction? = pendingAction
 
 
@@ -275,7 +294,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         if (supportFragmentManager.findFragmentByTag("AssetSheet") != null) return
 
         if (type == "filters") {
-            viewModel.prepareFilterPreviews()
+            viewModel.prepareFilterPreviews(this)
         }
 
         val sheet = StickerBottomSheetFragment.Companion.newInstance(title, type) { id ->
@@ -290,7 +309,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         val bitmap = BitmapFactory.decodeResource(resources, id)
         when (type) {
             "filters" -> {
-                val matrix = FilterUtils.getMatrixById(id)
+                val matrix = FilterUtils.getMatrixById(id, this)
                 matrix?.let {
                     binding.editorView.setFilter(it)
                     pendingAction = EditorAction.Filter(it)
@@ -324,21 +343,40 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
     private fun startUCrop(sourceUri: Uri) {
         val fileName = "Glowza_Edited_${System.currentTimeMillis()}.jpg"
         val destinationUri = Uri.fromFile(File(cacheDir, fileName))
+
         val options = UCrop.Options().apply {
             setCompressionQuality(90)
+
+            // Cụm nền
             setToolbarColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
             setStatusBarColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
-            setToolbarWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.primary))
+            setRootViewBackgroundColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
+
+            //Cụm chữ & Icon
+            setToolbarWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.onBackground))
+
+            //Điểm nhấn (Accent)
             setActiveControlsWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.primary))
-            setLogoColor(Color.TRANSPARENT)
+            setCropFrameColor(ContextCompat.getColor(this@EditorActivity, R.color.white))
+            setCropGridColor(ContextCompat.getColor(this@EditorActivity, R.color.white))
+
+            setLogoColor(android.graphics.Color.TRANSPARENT)
             setFreeStyleCropEnabled(true)
+
+            val cropTitle = getString(R.string.title_crop_image)
+            setToolbarTitle(cropTitle)
         }
-        UCrop.of(sourceUri, destinationUri).withOptions(options).start(this)
+
+        UCrop.of(sourceUri, destinationUri)
+            .withOptions(options)
+            .start(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.resetTool()
+        lifecycleScope.launch {
+            viewModel.resetTool()
+        }
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             resultUri?.toBitmap(this)?.let { bitmap ->
@@ -377,12 +415,14 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
     fun closeSubTool() {
         pendingAction = null // Xóa bỏ mọi pending đang treo
-        viewModel.resetTool() // Bắn tin hiệu để ẩn sub_tool_container
+        lifecycleScope.launch {
+            viewModel.resetTool()
+        }
     }
 
     private fun handleToolChange(type: ToolType) {
-
         binding.editorView.setDrawMode(type == ToolType.DRAW)
+        binding.subToolContainer.visibility = View.GONE
         when (type) {
             ToolType.ADJUST -> showAdjustmentSubTool()
             ToolType.TEXT -> {
