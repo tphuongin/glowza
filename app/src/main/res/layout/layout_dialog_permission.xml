@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="24dp"
     app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/surface">
+    app:cardBackgroundColor="@color/tertiary">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,6 +49,7 @@
                 android:layout_height="52dp"
                 android:layout_weight="1"
                 android:text="@string/btn_later"
+                android:backgroundTint="@color/tertiary"
                 android:textColor="@color/onSurfaceVariant"
                 app:cornerRadius="16dp" />
 
