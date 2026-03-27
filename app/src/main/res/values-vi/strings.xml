@@ -117,4 +117,6 @@
     <string name="hint_enter_text">Nhập nội dung tại đây…</string>
     <string name="action_cancel">HỦY</string>
     <string name="action_confirm">XÁC NHẬN</string>
+    <string name="draw_title">Draw</string>
+
 </resources>

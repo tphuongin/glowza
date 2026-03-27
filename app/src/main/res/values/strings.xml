@@ -118,5 +118,6 @@
     <string name="hint_enter_text">Enter text here...</string>
     <string name="action_cancel">CANCEL</string>
     <string name="action_confirm">CONFIRM</string>
+    <string name="draw_title">Draw</string>
 
 </resources>

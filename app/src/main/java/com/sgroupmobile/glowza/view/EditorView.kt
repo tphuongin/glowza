@@ -30,6 +30,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val drawPaths = mutableListOf<DrawItem>()
     private var currentPath: Path? = null
     private var currentDrawPaint: Paint? = null
+    var onDrawHistoryChanged: ((Boolean, Boolean) -> Unit)? = null
     private var brushColor = Color.parseColor("#F48FB1")
     private var brushSize = 20f
     private var isEraserMode = false
@@ -59,6 +60,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val last = drawPaths.removeAt(drawPaths.size - 1)
             redoPaths.add(last)
             invalidate()
+            notifyDrawHistory()
         }
     }
     fun setFramePreview(bitmap: Bitmap?) {
@@ -78,6 +80,9 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
 
         invalidate()
+    }
+    private fun notifyDrawHistory() {
+        onDrawHistoryChanged?.invoke(drawPaths.isNotEmpty(), redoPaths.isNotEmpty())
     }
     init {
         // Ép View vẽ bằng Software để không bị giới hạn 100MB của Canvas phần cứng
@@ -158,11 +163,13 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val lastRedo = redoPaths.removeAt(redoPaths.size - 1)
             drawPaths.add(lastRedo)
             invalidate()
+            notifyDrawHistory()
         }
     }
     fun clearAllDraw() {
         drawPaths.clear()
         invalidate()
+        notifyDrawHistory()
     }
 
     fun setBaseBitmap(bitmap: Bitmap) {
@@ -389,9 +396,12 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             }
             MotionEvent.ACTION_UP -> {
                 currentPath?.let { path ->
-                    currentDrawPaint?.let { paint -> drawPaths.add(DrawItem(path, paint)) }
+                    currentDrawPaint?.let { paint ->
+                        drawPaths.add(DrawItem(path, paint))
+                    }
                 }
                 currentPath = null
+                notifyDrawHistory()
             }
         }
         invalidate()

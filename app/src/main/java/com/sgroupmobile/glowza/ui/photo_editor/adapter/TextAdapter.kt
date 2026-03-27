@@ -40,6 +40,11 @@ class ColorAdapter(
         selectedPosition = 0
         notifyDataSetChanged()
     }
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
 
     override fun onBindViewHolder(h: ColorVH, position: Int) {
         val colorCode = colors[position]

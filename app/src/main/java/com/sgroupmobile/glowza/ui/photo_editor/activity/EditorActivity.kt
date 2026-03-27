@@ -462,10 +462,18 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         closeSubTool()
     }
     private fun showDrawSubTool() = replaceSubToolFragment(DrawSubToolFragment().apply {
-        onDrawConfigChanged = { color, size, isEraser -> binding.editorView.setBrushConfig(color, size, isEraser) }
+        onDrawConfigChanged = { color, size, isEraser ->
+            binding.editorView.setBrushConfig(color, size, isEraser)
+        }
         onUndoClicked = { binding.editorView.undoLastDraw() }
         onClearClicked = { binding.editorView.clearAllDraw() }
         onRedoClicked = { binding.editorView.redoLastDraw() }
+
+        binding.editorView.onDrawHistoryChanged = { canUndo, canRedo ->
+            if (isAdded && view != null) {
+                updateUndoRedoUI(canUndo, canRedo)
+            }
+        }
     })
 
     private fun showEditTextDialog(textItem: TextItem) {
