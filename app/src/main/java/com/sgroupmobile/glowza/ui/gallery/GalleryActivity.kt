@@ -42,6 +42,7 @@ class GalleryActivity : BaseActivity<ActivityGalleryBinding>() {
         super.onCreate(savedInstanceState)
         setupTabs()
         checkPermission()
+        setupInset(binding.toolbar)
     }
 
     private fun checkPermission() {
