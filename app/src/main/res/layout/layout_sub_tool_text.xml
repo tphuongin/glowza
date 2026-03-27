@@ -61,12 +61,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/text_label_size"
-                    android:textSize="12sp" />
+                    android:fontFamily="@font/regular"
+                    android:textSize="13sp" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderSize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:trackHeight="4dp"
+                    app:labelBehavior="gone"
                     android:valueFrom="10"
                     android:valueTo="100"
                     android:value="40" />
@@ -76,13 +79,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/text_label_opacity"
-                    android:textSize="12sp" />
+                    android:fontFamily="@font/regular"
+                    android:textSize="13sp" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderAlpha"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:valueFrom="0"
+                    app:trackHeight="4dp"
+                    app:labelBehavior="gone"
                     android:valueTo="255"
                     android:value="255" />
 
@@ -91,13 +97,32 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:text="@string/text_label_color"
-                    android:textSize="12sp" />
+                    android:fontFamily="@font/regular"
+                    android:textSize="13sp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvColors"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/btnResetColor"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="12dp"
+                        android:padding="6dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_pen"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvColors"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

@@ -69,7 +69,6 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
             act?.cancelPendingAction()
             act?.closeSubTool()
             it.isEnabled = true
-            Log.e("eeeeeeee", "cancel click ${act}")
         }
 
         binding.btnConfirmAdjust.setOnClickListener {
@@ -79,7 +78,6 @@ class AdjustmentSubToolFragment : BaseFragment<LayoutSubToolAdjustmentBinding>()
             act?.confirmPendingAction()
             act?.closeSubTool()
             it.isEnabled = true
-            Log.e("eeeeeeee", "confirm click ${act}")
         }
     }
 

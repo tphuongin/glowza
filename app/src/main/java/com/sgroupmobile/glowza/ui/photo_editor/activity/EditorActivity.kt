@@ -174,6 +174,14 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         binding.editorView.onTextItemClicked = { textItem ->
             showEditTextDialog(textItem)
         }
+        binding.editorView.onItemSelected = { selectedItem ->
+            // Kiểm tra xem TextSubToolFragment có đang hiển thị không
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.sub_tool_container)
+            if (currentFragment is TextSubToolFragment && selectedItem is TextItem) {
+                // Nếu đúng là đang mở tab Text và đang chọn TextItem, thì cập nhật target
+                currentFragment.setTargetItem(selectedItem)
+            }
+        }
 
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnRedo.setOnClickListener { viewModel.redo() }
@@ -506,11 +514,9 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         } else {
             val newItem = TextItem("Glowza").apply {
                 id = System.currentTimeMillis()
-                textPaint.apply {
-                    color = Color.WHITE
-                    textSize = 100f
-                    isAntiAlias = true
-                }
+                setTextColor(Color.WHITE)
+                setTextSize(100f)
+                textPaint.isAntiAlias = true
             }
             viewModel.addNewItem(newItem)
 

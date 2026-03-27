@@ -38,6 +38,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val imageBounds = RectF()
 
     var onTextItemClicked: ((TextItem) -> Unit)? = null
+    var onItemSelected: ((BaseItem?) -> Unit)? = null
 
     // Paint để vẽ Bitmap mượt hơn
     private val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
@@ -127,18 +128,15 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 val w = item.getWidth()
                 val h = item.getHeight()
 
-                val isInside = if (item is TextItem) {
-                    localX >= 0f && localX <= w && localY >= (-h - 10f) && localY <= h
-                } else {
-                    localX >= 0f && localX <= w && localY >= 0f && localY <= h
-                }
+                val p = 10f
+
+                val isInside = localX >= -p && localX <= (w + p) && localY >= -p && localY <= (h + p)
 
                 if (isInside) return item
             }
         }
         return null
     }
-
     fun setDrawMode(enabled: Boolean) {
         this.isDrawMode = enabled
         if (enabled) {
@@ -308,9 +306,11 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     items.add(hitItem)
 
                     touchMode = MODE_DRAG
+                    onItemSelected?.invoke(selectedItem)
                 } else {
                     selectedItem = null
                     items.forEach { it.isSelected = false }
+                    onItemSelected?.invoke(null)
                 }
 
                 lastX = x

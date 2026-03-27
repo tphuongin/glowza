@@ -18,7 +18,7 @@ import com.sgroupmobile.glowza.ui.photo_editor.adapter.FontAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.TemplateAdapter
 
 class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
-
+    private var colorAdapter: ColorAdapter? = null
     var onStyleUpdated: (() -> Unit)? = null
     var onTemplateSelected: ((TextItem) -> Unit)? = null
 
@@ -39,13 +39,32 @@ class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
 
     override fun setupListeners() {
         setupStyleListeners()
+
+        binding.btnResetColor.setOnClickListener {
+            activeTextItem?.let { item ->
+                item.textPaint.shader = null
+                item.setTextColor(Color.WHITE)
+
+                colorAdapter?.resetSelection()
+
+                onStyleUpdated?.invoke()
+            }
+        }
     }
 
     fun setTargetItem(item: TextItem) {
         this.activeTextItem = item
         if (view != null) {
+            // Tạm thời gỡ bỏ listener để tránh trigger nhầm khi tự động set value
+            binding.sliderSize.clearOnChangeListeners()
+            binding.sliderAlpha.clearOnChangeListeners()
+
+            // Cập nhật giá trị thanh trượt theo chữ mới
             binding.sliderSize.value = item.textPaint.textSize.coerceIn(10f, 200f)
             binding.sliderAlpha.value = item.textPaint.alpha.toFloat().coerceIn(0f, 255f)
+
+            // Gắn lại listener
+            setupStyleListeners()
         }
     }
 
@@ -60,6 +79,7 @@ class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
     }
+
 
     private fun setupStyleListeners() {
         binding.sliderSize.addOnChangeListener { _, value, fromUser ->
@@ -78,14 +98,24 @@ class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
     }
 
     private fun setupLists() {
+        // Màu sắc
         val colors = ColorProvider.getEditorColors()
         binding.rvColors.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvColors.adapter = ColorAdapter(colors) { colorStr ->
+        // Khởi tạo và gán vào biến toàn cục
+        colorAdapter = ColorAdapter(colors) { colorStr ->
+            activeTextItem?.textPaint?.shader = null
             activeTextItem?.setTextColor(Color.parseColor(colorStr))
             onStyleUpdated?.invoke()
         }
+        binding.rvColors.adapter = colorAdapter
+
+        // Font chữ
         val fonts = TextTemplateProvider.getFontList()
-        binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFonts.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        binding.rvFonts.setPadding(8, 8, 8, 8)
+        binding.rvFonts.clipToPadding = false
+
         binding.rvFonts.adapter = FontAdapter(fonts) { fontPath ->
             try {
                 val tf = Typeface.createFromAsset(requireContext().assets, "fonts/$fontPath")
@@ -96,6 +126,7 @@ class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
             }
         }
 
+        // (Templates)
         val templates = TextTemplateProvider.getTemplates(requireContext().assets)
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = TemplateAdapter(templates) { template ->

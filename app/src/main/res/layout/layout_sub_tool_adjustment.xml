@@ -43,7 +43,8 @@
             android:src="@drawable/ic_check"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onBackground" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.slider.Slider
@@ -54,7 +55,7 @@
         app:labelBehavior="gone"
         app:thumbColor="@color/primary"
         app:trackColorActive="@color/primary"
-        app:trackHeight="3dp"
+        app:trackHeight="4dp"
         app:trackColorInactive="#E0E0E0" />
 
     <androidx.recyclerview.widget.RecyclerView
