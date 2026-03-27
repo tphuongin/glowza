@@ -1,5 +1,6 @@
 package com.sgroupmobile.glowza.ui.photo_editor.activity
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
@@ -65,6 +66,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         setupMainTabs()
         setupListeners()
         handleIntentData()
+        setupInset(binding.btnBack)
     }
 
     override fun setupObservers() {
@@ -115,7 +117,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
     }
     private fun updateNavigationUI(state: EditorViewModel.NavigationState) {
-        val activeColor = ContextCompat.getColor(this, R.color.primary)
+        val activeColor = ContextCompat.getColor(this, R.color.onBackground)
         val inactiveColor = "#9E9E9E".toColorInt()
 
         binding.btnUndo.apply {
@@ -189,8 +191,11 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         dialog.setContentView(dialogBinding.root)
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // lấy thông số kích thước màn hình điện thoại
+        val displayMetrics = resources.displayMetrics
+        val dialogWidth = (displayMetrics.widthPixels * 0.85).toInt()
         dialog.window?.setLayout(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            dialogWidth,
             android.view.ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
@@ -525,7 +530,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         val view = tab?.customView ?: return
         val icon = view.findViewById<ImageView>(R.id.tabIcon)
         val text = view.findViewById<TextView>(R.id.tabText)
-        val color = if (isSelected) ContextCompat.getColor(this, R.color.primary) else "#9E9E9E".toColorInt()
+        val color = if (isSelected) ContextCompat.getColor(this, R.color.primary) else ContextCompat.getColor(this, R.color.onBackground)
         icon.setColorFilter(color)
         text.setTextColor(color)
     }

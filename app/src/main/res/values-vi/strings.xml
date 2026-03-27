@@ -96,7 +96,7 @@
     <string name="social_tiktok">Tiktok</string>
 
     <string name="dialog_exit_editor_title">Rời khỏi trình chỉnh sửa?</string>
-    <string name="dialog_exit_editor_message">Các thay đổi của bạn chưa được lưu. Bạn có chắc chắn muốn hủy bỏ các chỉnh sửa này không?</string>
+    <string name="dialog_exit_editor_message">Các thay đổi của bạn chưa được lưu.\nBạn chắc chắn muốn hủy bỏ các chỉnh sửa này?</string>
     <string name="action_discard">Thoát</string>
     <string name="action_continue_editing">Tiếp tục</string>
 </resources>
