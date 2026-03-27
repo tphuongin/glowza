@@ -113,4 +113,8 @@
     <string name="title_choose_frame">Chọn Khung Hình</string>
     <string name="adjust_title">Căn chỉnh</string>
 
+    <string name="title_edit_text">Chỉnh sửa nội dung</string>
+    <string name="hint_enter_text">Nhập nội dung tại đây…</string>
+    <string name="action_cancel">HỦY</string>
+    <string name="action_confirm">XÁC NHẬN</string>
 </resources>

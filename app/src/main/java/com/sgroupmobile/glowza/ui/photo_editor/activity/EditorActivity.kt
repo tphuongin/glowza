@@ -171,7 +171,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         binding.btnBack.setOnClickListener {
             confirmExit()
         }
-        binding.editorView.onTextItemDoubleClicked = { textItem ->
+        binding.editorView.onTextItemClicked = { textItem ->
             showEditTextDialog(textItem)
         }
 
@@ -459,6 +459,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         onClearClicked = { binding.editorView.clearAllDraw() }
         onRedoClicked = { binding.editorView.redoLastDraw() }
     })
+
     private fun showEditTextDialog(textItem: TextItem) {
         val dialog = Dialog(this)
         val bindingDialog = LayoutDialogEditTextBinding.inflate(layoutInflater)

@@ -114,4 +114,9 @@
 
     <string name="adjust_title">Adjustment</string>
 
+    <string name="title_edit_text">Edit Content</string>
+    <string name="hint_enter_text">Enter text here...</string>
+    <string name="action_cancel">CANCEL</string>
+    <string name="action_confirm">CONFIRM</string>
+
 </resources>

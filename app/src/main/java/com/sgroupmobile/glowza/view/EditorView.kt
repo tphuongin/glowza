@@ -37,7 +37,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val imageBounds = RectF()
 
-    var onTextItemDoubleClicked: ((TextItem) -> Unit)? = null
+    var onTextItemClicked: ((TextItem) -> Unit)? = null
 
     // Paint để vẽ Bitmap mượt hơn
     private val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
@@ -103,15 +103,41 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val gestureDetector =
         GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                val hitItem = items.findLast { it.containsPoint(e.x, e.y) }
-                if (hitItem is TextItem) {
-                    onTextItemDoubleClicked?.invoke(hitItem)
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                val clickedItem = findItemAtPoint(e.x, e.y)
+                if (clickedItem is TextItem) {
+                    onTextItemClicked?.invoke(clickedItem)
                     return true
                 }
-                return false
+                return super.onSingleTapConfirmed(e)
             }
         })
+    private fun findItemAtPoint(touchX: Float, touchY: Float): BaseItem? {
+        for (i in items.indices.reversed()) {
+            val item = items[i]
+            if (item is DrawItem) continue
+
+            val inverseMatrix = Matrix()
+            if (item.matrix.invert(inverseMatrix)) {
+                val touchPoints = floatArrayOf(touchX, touchY)
+                inverseMatrix.mapPoints(touchPoints)
+
+                val localX = touchPoints[0]
+                val localY = touchPoints[1]
+                val w = item.getWidth()
+                val h = item.getHeight()
+
+                val isInside = if (item is TextItem) {
+                    localX >= 0f && localX <= w && localY >= (-h - 10f) && localY <= h
+                } else {
+                    localX >= 0f && localX <= w && localY >= 0f && localY <= h
+                }
+
+                if (isInside) return item
+            }
+        }
+        return null
+    }
 
     fun setDrawMode(enabled: Boolean) {
         this.isDrawMode = enabled
