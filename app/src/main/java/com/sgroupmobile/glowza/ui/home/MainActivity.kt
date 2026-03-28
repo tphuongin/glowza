@@ -4,8 +4,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
@@ -15,6 +18,7 @@ import com.sgroupmobile.glowza.base.BaseActivity
 import com.sgroupmobile.glowza.data.data_store.setting.SettingsDataStore
 import com.sgroupmobile.glowza.data.data_store.setting.settingsDataStore
 import com.sgroupmobile.glowza.databinding.ActivityMainBinding
+import com.sgroupmobile.glowza.extension.dpToPx
 import com.sgroupmobile.glowza.ui.home.fragment.HomeFragment
 import com.sgroupmobile.glowza.ui.onboarding.OnboardingActivity
 import com.sgroupmobile.glowza.ui.profile.ProfileFragment
@@ -70,26 +74,68 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun setupUI() {
-        setupBottomNav()
-        binding.bottomNav.selectedItemId = ProfileFragment.currentTabId
+        setupCustomBottomNav()
+
+        // set default tab
+        if (ProfileFragment.currentTabId == R.id.nav_profile) {
+            selectTab(R.id.nav_profile)
+            replaceFragment(ProfileFragment())
+        } else {
+            selectTab(R.id.nav_home)
+            replaceFragment(HomeFragment())
+        }
+        setupInset(binding.root, binding.bottomBar)
     }
+    private fun setupCustomBottomNav() {
+        binding.navHome.setOnClickListener {
+            selectTab(R.id.nav_home)
+            replaceFragment(HomeFragment())
+        }
 
-    override fun setupInset(topView: View, bottomView: View) { }
-
-    private fun setupBottomNav() {
-        binding.bottomNav.setOnItemSelectedListener { item ->
-            val fragment = when (item.itemId) {
-                R.id.nav_home -> HomeFragment()
-                R.id.nav_profile -> ProfileFragment()
-                else -> null
-            }
-
-            fragment?.let {
-                replaceFragment(it)
-                true
-            } ?: false
+        binding.navProfile.setOnClickListener {
+            selectTab(R.id.nav_profile)
+            replaceFragment(ProfileFragment())
         }
     }
+    private fun selectTab(tabId: Int) {
+        val activeColor = getColor(R.color.onBackground)
+        val inactiveColor = getColor(R.color.surfaceVariant)
+
+        // reset
+        binding.iconHome.setColorFilter(inactiveColor)
+        binding.textHome.setTextColor(inactiveColor)
+
+        binding.iconProfile.setColorFilter(inactiveColor)
+        binding.textProfile.setTextColor(inactiveColor)
+
+        // active
+        when (tabId) {
+            R.id.nav_home -> {
+                binding.iconHome.setColorFilter(activeColor)
+                binding.textHome.setTextColor(activeColor)
+            }
+            R.id.nav_profile -> {
+                binding.iconProfile.setColorFilter(activeColor)
+                binding.textProfile.setTextColor(activeColor)
+            }
+        }
+    }
+
+    override fun setupInset(topView: View, bottomView: View) {
+        ViewCompat.setOnApplyWindowInsetsListener(topView) { _, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val params = bottomView.layoutParams as ViewGroup.MarginLayoutParams
+            params.setMargins(
+                systemBars.left,
+                0,
+                systemBars.right,
+                systemBars.bottom + 14.dpToPx()
+            )
+            bottomView.layoutParams = params
+            insets
+        }
+    }
+
 
     private fun replaceFragment(fragment: Fragment) {
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)

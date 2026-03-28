@@ -87,7 +87,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
         val padding = (recyclerWidth - itemWidth) / 2
 
-        binding.rvModeCamera.setPadding(padding, 0, padding, 0)
+        binding.rvModeCamera.setPadding(padding, 70, padding, 0)
         setupInset(binding.btnExit, binding.rvModeCamera)
     }
 

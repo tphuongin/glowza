@@ -4,5 +4,12 @@
     <style name="TransparentBottomNav" parent="">
         <item name="colorSecondaryContainer">@android:color/transparent</item>
     </style>
+    <style name="RoundedImageViewShape">
+        <item name="cornerSize">16dp</item>
+    </style>
+    <style name="EmptyIndicator">
+        <item name="android:color">@android:color/transparent</item>
+        <item name="android:height">0dp</item>
+    </style>
 
 </resources>

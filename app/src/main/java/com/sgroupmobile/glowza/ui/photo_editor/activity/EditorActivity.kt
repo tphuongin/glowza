@@ -369,6 +369,8 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
             setCropGridColor(ContextCompat.getColor(this@EditorActivity, R.color.white))
 
             setLogoColor(android.graphics.Color.TRANSPARENT)
+            setHideBottomControls(false)
+
             setFreeStyleCropEnabled(true)
 
             val cropTitle = getString(R.string.title_crop_image)
