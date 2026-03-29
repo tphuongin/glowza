@@ -1,0 +1,15 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/filter_box_size"
+    android:layout_height="@dimen/filter_box_size"
+    android:padding="@dimen/button_side_padding">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/img_filter_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_filter_item_unselected"
+        app:shapeAppearanceOverlay="@style/CircleImage" />
+</FrameLayout>

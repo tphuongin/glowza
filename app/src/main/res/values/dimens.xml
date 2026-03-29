@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="normal_padding">20dp</dimen>
+    <dimen name="dialog_margin_top_large">32dp</dimen>
+    <dimen name="dialog_margin_top_small">12dp</dimen>
+    <dimen name="button_side_margin">8dp</dimen>
+    <dimen name="button_side_padding">8dp</dimen>
+    <dimen name="normal_bottom_margin">16dp</dimen>
+    <dimen name="padding_vertical">12dp</dimen>
+    <dimen name="small_padding_vertical">8dp</dimen>
+
+    <dimen name="title_text">20sp</dimen>
+    <dimen name="content_text">16sp</dimen>
+    <dimen name="big_text">100sp</dimen>
+
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="button_corner_radius">16dp</dimen>
+    <dimen name="line_spacing_extra">4dp</dimen>
+    <dimen name="middle_padding">35dp</dimen>
+
+    <dimen name="setting_button_width">50dp</dimen>
+    <dimen name="setting_button_height">40dp</dimen>
+    <dimen name="ratio_button_width">65dp</dimen>
+    <dimen name="letter_box_height">80dp</dimen>
+    <dimen name="snap_margin_bottom">93dp</dimen>
+    <dimen name="filter_box_size">80dp</dimen>
+    <dimen name="tool_bar_height">56dp</dimen>
+
+    <dimen name="editor_toolbar_margin">16dp</dimen>
+    <dimen name="editor_toolbar_radius">24dp</dimen>
+    <dimen name="editor_toolbar_elevation">8dp</dimen>
+    <dimen name="editor_tool_padding">8dp</dimen>
+
+    <dimen name="editor_control_margin">16dp</dimen>
+    <dimen name="editor_control_size">40dp</dimen>
+    <dimen name="editor_control_spacing">8dp</dimen>
+
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_normal">8dp</dimen>
+    <dimen name="editor_toolbar_height">90dp</dimen>
+
+    <dimen name="editor_tab_padding">20dp</dimen>
+    <dimen name="bonus_view">40dp</dimen>
+    <dimen name="middle_text">16sp</dimen>
+    <dimen name="middle_margin">16dp</dimen>
+    <dimen name="timer_margin">20dp</dimen>
+    <dimen name="timer_height">48dp</dimen>
+    <dimen name="tab_camera_height">60dp</dimen>
+    <dimen name="mode_width">80dp</dimen>
+    <dimen name="small_padding">8dp</dimen>
+    <dimen name="editor_tab_icon_size">28dp</dimen>
+
+</resources>

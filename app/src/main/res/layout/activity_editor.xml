@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <FrameLayout
+        android:id="@+id/editor_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/layout_top_controls"
+        app:layout_constraintBottom_toTopOf="@id/guideline_toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginVertical="@dimen/spacing_normal"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/img_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter" />
+
+        <com.sgroupmobile.glowza.view.EditorView
+            android:id="@+id/editor_view_origin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <com.sgroupmobile.glowza.view.EditorView
+            android:id="@+id/editor_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btn_compare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_compare"
+            android:background="@null"
+            app:tint="@color/onBackground"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/normal_padding"
+            />
+
+
+    </FrameLayout>
+
+    <View
+        android:id="@+id/adjust_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="@dimen/editor_control_size"
+        android:layout_height="@dimen/editor_control_size"
+        android:layout_margin="@dimen/editor_control_margin"
+        android:src="@drawable/exit"
+        android:layout_marginTop="-15dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/onBackground"
+        app:layout_constraintTop_toBottomOf="@id/adjust_view"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layout_top_controls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/editor_control_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="@id/btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/btn_back"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btn_undo"
+            android:layout_width="@dimen/editor_control_size"
+            android:layout_height="@dimen/editor_control_size"
+            android:src="@drawable/ic_undo"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/onSurface"/>
+
+        <ImageButton
+            android:id="@+id/btn_redo"
+            android:layout_width="@dimen/editor_control_size"
+            android:layout_height="@dimen/editor_control_size"
+            android:src="@drawable/ic_redo"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/onSurface"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginStart="12dp"
+            android:text="@string/btn_save"
+            android:textSize="16sp"
+            android:backgroundTint="@color/primary"
+            android:fontFamily="@font/regular"
+            app:cornerRadius="20dp"
+            app:iconTint="@color/white"
+            android:textColor="@color/white"
+            app:icon="@drawable/ic_save"
+            app:iconSize="20dp"
+
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingVertical="0dp" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/sub_tool_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/main_toolbar_card"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/editor_toolbar_height"
+        android:layout_margin="@dimen/editor_toolbar_margin"
+        app:cardBackgroundColor="@color/tertiary"
+        app:cardCornerRadius="@dimen/editor_toolbar_radius"
+        app:cardElevation="@dimen/editor_toolbar_elevation"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_editor_tools"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/editor_toolbar_height"
+            android:background="@android:color/transparent"
+            app:tabMode="scrollable"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp"
+            app:tabRippleColor="@android:color/transparent"
+            app:tabPaddingStart="@dimen/editor_tab_padding"
+            app:tabPaddingEnd="@dimen/editor_tab_padding" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

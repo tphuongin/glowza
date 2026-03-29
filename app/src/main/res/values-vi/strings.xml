@@ -1,0 +1,128 @@
+<resources>
+    <string name="app_name">Glowza</string>
+    <string name="hello_blank_fragment">Xin chào</string>
+    <string name="exit_application">Thoát</string>
+    <string name="title_camera_permission">Cho phép Glowza truy cập máy ảnh</string>
+    <string name="description_camera_permission">Bạn có thể chụp ảnh và trải nghiệm các tính năng. Bạn có thể thay đổi lựa chọn này bất cứ lúc nào trong phần cài đặt.</string>
+    <string name="go_to_setting">Đi tới Cài đặt</string>
+    <string name="title_gallery_permission">Cho phép Glowza truy cập ảnh của bạn</string>
+    <string name="description_gallery_permission">Truy cập thư viện để chọn và chỉnh sửa hình ảnh của bạn. Bạn có thể thay đổi quyền này bất cứ lúc nào trong phần cài đặt.</string>
+    <string name="cancel">Hủy</string>
+
+    <string name="setting_timer">Hẹn giờ (giây)</string>
+    <string name="setting_ratio">Tỉ lệ ảnh</string>
+    <string name="setting_grid">Lưới</string>
+    <string name="setting_timer_off">Ø</string>
+    <string name="title_audio_permission">Quyền truy cập âm thanh</string>
+    <string name="description_audio_permission">Glowza cần quyền này để bạn có thể quay video kèm âm thanh.</string>
+    <string name="timer_notification">Hẹn giờ</string>
+    <string name="video_timer_default">00:00</string>
+    <string name="camera_mode">Chế độ</string>
+
+    <string name="save_success">Đã lưu vào Album Glowza!</string>
+    <string name="save_error">Lỗi rồi, thử lại nhé!</string>
+
+    <string name="gallery_title">Bộ sưu tập</string>
+
+    <string name="tool_crop">Cắt</string>
+    <string name="tool_filter">Bộ lọc</string>
+    <string name="tool_adjust">Chỉnh sửa</string>
+    <string name="tool_sticker">Nhãn dán</string>
+    <string name="tool_text">Chữ</string>
+    <string name="tool_draw">Vẽ</string>
+    <string name="tool_frame">Khung</string>
+
+    <string name="crop_free">Tự do</string>
+
+    <string name="adjust_brightness">Độ sáng</string>
+    <string name="adjust_contrast">Tương phản</string>
+    <string name="adjust_saturation">Bão hòa</string>
+
+    <string name="adjust_vignette">Làm mờ viền</string>
+    <string name="adjust_sharpen">Độ sắc nét</string>
+    <string name="adjust_warmth">Độ ấm</string>
+
+    <string name="text_tab_template">Mẫu</string>
+    <string name="text_tab_style">Kiểu chữ</string>
+    <string name="text_tab_font">Phông chữ</string>
+    <string name="text_label_size">Kích thước</string>
+    <string name="text_label_opacity">Độ mờ</string>
+    <string name="text_label_color">Màu sắc</string>
+    <string name="btn_save">Save</string>
+    <string name="title_crop_image">Crop</string>
+
+    <string name="func_edit">Chỉnh sửa</string>
+    <string name="func_camera">Camera</string>
+    <string name="func_my_photos">Ảnh đã sửa</string>
+    <string name="func_stitch">Dải ảnh</string>
+    <string name="func_photobooth">Photobooth</string>
+    <string name="func_my_videos">Video của bạn</string>
+
+    <string name="ob_title_1">Chỉnh sửa như chuyên gia</string>
+    <string name="ob_desc_1">Nâng tầm bức ảnh của bạn với công cụ mạnh mẽ, bộ lọc và hiệu ứng — chỉ với vài thao tác chạm.</string>
+
+    <string name="ob_title_2">Ghi lại mọi khoảnh khắc</string>
+    <string name="ob_desc_2">Chụp những bức ảnh ấn tượng ngay lập tức với camera thông minh và bộ lọc thời gian thực.</string>
+
+    <string name="ob_title_3">Chia sẻ phong cách của bạn</string>
+    <string name="ob_desc_3">Xuất và chia sẻ tác phẩm của bạn với bạn bè và mạng xã hội chỉ trong vài giây.</string>
+
+    <string name="next">Tiếp theo</string>
+    <string name="start_now">Bắt đầu ngay</string>
+    <string name="skip">Bỏ qua</string>
+
+    <string name="home">Trang chủ</string>
+    <string name="profile">Cá nhân</string>
+    <string name="explore">Khám phá ngay thôi</string>
+
+    <string name="user_name">User</string>
+    <string name="setting_dark_mode">Chế độ tối</string>
+    <string name="setting_language">Ngôn ngữ</string>
+
+    <string-array name="language_options">
+        <item>Tiếng Việt</item>
+        <item>Tiếng Anh</item>
+    </string-array>
+
+    <string name="edit_more">Chỉnh sửa thêm</string>
+    <string name="back_to_gallery">Quay lại thư viện ảnh</string>
+    <string name="share_to">Chia sẻ lên</string>
+    <string name="features">Nổi bật</string>
+
+    <string name="social_messenger">Messenger</string>
+    <string name="social_instagram">Instagram</string>
+    <string name="social_facebook">Facebook</string>
+    <string name="social_whatsapp">WhatsApp</string>
+    <string name="social_tiktok">Tiktok</string>
+
+    <string name="dialog_exit_editor_title">Rời khỏi trình chỉnh sửa?</string>
+    <string name="dialog_exit_editor_message">Các thay đổi của bạn chưa được lưu.\nBạn chắc chắn muốn hủy bỏ các chỉnh sửa này?</string>
+    <string name="action_discard">Thoát</string>
+    <string name="action_continue_editing">Tiếp tục</string>
+
+    <string name="filter_grayscale">Trắng đen</string>
+    <string name="filter_sepia">Cổ điển</string>
+    <string name="filter_vintage">Vintage</string>
+    <string name="filter_cold">Lạnh</string>
+    <string name="filter_warm">Ấm áp</string>
+    <string name="filter_polaroid">Polaroid</string>
+    <string name="filter_cinematic">Điện ảnh</string>
+    <string name="filter_high_contrast">Độ tương phản</string>
+    <string name="title_choose_filter">Chọn Bộ Lọc</string>
+    <string name="title_choose_sticker">Chọn Nhãn Dán</string>
+    <string name="title_choose_frame">Chọn Khung Hình</string>
+    <string name="adjust_title">Căn chỉnh</string>
+
+    <string name="title_edit_text">Chỉnh sửa nội dung</string>
+    <string name="hint_enter_text">Nhập nội dung tại đây…</string>
+    <string name="action_cancel">HỦY</string>
+    <string name="action_confirm">XÁC NHẬN</string>
+    <string name="draw_title">Draw</string>
+    <string name="permission_title">Cấp quyền truy cập</string>
+    <string name="permission_message">Để sử dụng tính năng này, Glowza cần bạn cấp quyền truy cập bộ nhớ để chọn và chỉnh sửa ảnh.</string>
+
+    <string name="btn_later">Để sau</string>
+    <string name="btn_retry">Thử lại</string>
+    <string name="btn_setting">Cài đặt</string>
+
+</resources>

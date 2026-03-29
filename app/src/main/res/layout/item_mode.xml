@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvMode"
+    android:layout_width="@dimen/mode_width"
+    android:layout_height="match_parent"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:text="@string/camera_mode"
+    android:textSize="14sp"
+    android:fontFamily="@font/bold"
+    android:letterSpacing="0.1"
+    android:gravity="center"
+    android:paddingBottom="@dimen/small_padding"
+    android:paddingHorizontal="@dimen/small_padding"
+    />

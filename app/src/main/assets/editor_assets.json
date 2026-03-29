@@ -1,0 +1,31 @@
+{
+  "stickers": [
+    { "id": 201, "name": "Chicken", "res_name": "animal_sticker_chicken" },
+    { "id": 202, "name": "Corgi", "res_name": "animal_sticker_corgi" },
+    { "id": 203, "name": "Duck", "res_name": "animal_sticker_duck" },
+    { "id": 204, "name": "Education", "res_name": "animal_sticker_education" },
+    { "id": 205, "name": "Hello", "res_name": "animal_sticker_hello" },
+    { "id": 206, "name": "Marketing", "res_name": "animal_sticker_marketing" },
+    { "id": 207, "name": "Pig", "res_name": "animal_sticker_pig" },
+    { "id": 208, "name": "Seal", "res_name": "animal_sticker_seal" },
+    { "id": 209, "name": "Water", "res_name": "animal_sticker_water" },
+    { "id": 210, "name": "Whale", "res_name": "animal_sticker_whale" },
+    { "id": 211, "name": "Banana", "res_name": "food_sticker_banana" },
+    { "id": 212, "name": "Cake", "res_name": "food_sticker_cake" },
+    { "id": 213, "name": "Dimsum", "res_name": "food_sticker_dimsum" },
+    { "id": 214, "name": "Hamburger", "res_name": "food_sticker_hamburger" },
+    { "id": 215, "name": "Milk", "res_name": "food_sticker_milk" },
+    { "id": 216, "name": "Milk Carton", "res_name": "food_sticker_milkcarton" },
+    { "id": 217, "name": "Nap", "res_name": "food_sticker_nap" },
+    { "id": 218, "name": "Noodle", "res_name": "food_sticker_noodle" },
+    { "id": 219, "name": "Sushi", "res_name": "food_sticker_sushi" }
+  ],
+  "frames": [
+    { "id": 301, "name": "Circle", "res_name": "frame_circle" },
+    { "id": 302, "name": "Basic", "res_name": "frame_basic" },
+    { "id": 303, "name": "Color", "res_name": "frame_color" },
+    { "id": 304, "name": "Cute", "res_name": "frame_cute" },
+    { "id": 305, "name": "Purple", "res_name": "frame_purple" },
+    { "id": 306, "name": "Scrapbook", "res_name": "frame_scrapbook" }
+  ]
+}
