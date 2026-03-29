@@ -13,6 +13,11 @@
     <string name="setting_ratio">Aspect Ratio</string>
     <string name="setting_grid">Grid</string>
     <string name="setting_timer_off">Ø</string>
+    <string name="title_audio_permission">Audio Permission</string>
+    <string name="description_audio_permission">Glowza needs this permission so you can record videos with sound.</string>
+    <string name="timer_notification">Timer</string>
+    <string name="video_timer_default">00:00</string>
+    <string name="camera_mode">Mode</string>
 
     <string name="save_success">Saved to Glowza Album!</string>
     <string name="save_error">Error, please try again!</string>
@@ -46,5 +51,79 @@
     <string name="btn_save">Save</string>
     <string name="title_crop_image">Crop</string>
 
+    <string name="func_edit">Edit</string>
+    <string name="func_camera">Camera</string>
+    <string name="func_my_photos">My Photos</string>
+    <string name="func_stitch">Collage</string>
+    <string name="func_photobooth">Photobooth</string>
+    <string name="func_my_videos">My Videos</string>
+
+    <string name="ob_title_1">Edit Like a Pro</string>
+    <string name="ob_desc_1">Enhance your photos with powerful tools, filters, and effects — all in just a few taps.</string>
+
+    <string name="ob_title_2">Capture Every Moment</string>
+    <string name="ob_desc_2">Take stunning photos instantly with smart camera features and real-time filters.</string>
+
+    <string name="ob_title_3">Share Your Style</string>
+    <string name="ob_desc_3">Export and share your creations with friends and social media in seconds.</string>
+
+    <string name="next">Next</string>
+    <string name="start_now">Start Now</string>
+    <string name="skip">Skip</string>
+
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="explore">Let\'s try now</string>
+
+    <string name="user_name">User</string>
+    <string name="setting_dark_mode">Dark Mode</string>
+    <string name="setting_language">Language</string>
+
+    <string-array name="language_options">
+        <item>Vietnamese</item>
+        <item>English</item>
+    </string-array>
+
+    <string name="edit_more">Edit more</string>
+    <string name="back_to_gallery">Back to Gallery</string>
+    <string name="share_to">Share to</string>
+    <string name="features">Featured</string>
+
+    <string name="social_messenger">Messenger</string>
+    <string name="social_instagram">Instagram</string>
+    <string name="social_facebook">Facebook</string>
+    <string name="social_whatsapp">WhatsApp</string>
+    <string name="social_tiktok">Tiktok</string>
+
+    <string name="dialog_exit_editor_title">Leave the editor?</string>
+    <string name="dialog_exit_editor_message">Your changes have not been saved.\nAre you sure to discard these edits?</string>
+    <string name="action_discard">Discard</string>
+    <string name="action_continue_editing">Continue</string>
+
+    <string name="filter_grayscale">Black &amp; White</string>
+    <string name="filter_sepia">Classic</string>
+    <string name="filter_vintage">Vintage</string>
+    <string name="filter_cold">Cool</string>
+    <string name="filter_warm">Warm</string>
+    <string name="filter_polaroid">Polaroid</string>
+    <string name="filter_cinematic">Cinematic</string>
+    <string name="filter_high_contrast">High Contrast</string>
+    <string name="title_choose_filter">Choose Filter</string>
+    <string name="title_choose_sticker">Choose Sticker</string>
+    <string name="title_choose_frame">Choose Frame</string>
+
+    <string name="adjust_title">Adjustment</string>
+
+    <string name="title_edit_text">Edit Content</string>
+    <string name="hint_enter_text">Enter text here...</string>
+    <string name="action_cancel">CANCEL</string>
+    <string name="action_confirm">CONFIRM</string>
+    <string name="draw_title">Draw</string>
+
+    <string name="permission_title">Permission Required</string>
+    <string name="permission_message">To use this feature, Glowza needs access to your storage to select and edit photos.</string>
+    <string name="btn_later">Later</string>
+    <string name="btn_retry">Try Again</string>
+    <string name="btn_setting">Settings</string>
 
 </resources>

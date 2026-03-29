@@ -34,15 +34,16 @@ class TextItem(
     }
     private var fontMetrics: Paint.FontMetrics = textPaint.fontMetrics
 
+    // Trong class TextItem
     override fun getMappedPoints(): FloatArray {
         val w = getWidth()
         val h = getHeight()
+        val p = 5f
 
-        // 0,1: Top-Left | 2,3: Top-Right | 4,5: Bottom-Right | 6,7: Bottom-Left
-        boundPoints[0] = 0f; boundPoints[1] = -h-10
-        boundPoints[2] = w;  boundPoints[3] = -h-10
-        boundPoints[4] = w;  boundPoints[5] = h
-        boundPoints[6] = 0f; boundPoints[7] = h
+        boundPoints[0] = -p;      boundPoints[1] = -p    // Top-Left
+        boundPoints[2] = w + p;   boundPoints[3] = -p    // Top-Right
+        boundPoints[4] = w + p;   boundPoints[5] = h + p // Bottom-Right
+        boundPoints[6] = -p;      boundPoints[7] = h + p // Bottom-Left
 
         matrix.mapPoints(_mappedPoints, boundPoints)
         return _mappedPoints
@@ -53,10 +54,10 @@ class TextItem(
     fun updateText(newText: String) {
         this.text = newText
     }
-    // Trong class TextItem.kt
     fun applyStyleFrom(other: TextItem) {
         this.textPaint.set(other.textPaint)
         this.setTextAlpha(other.textPaint.alpha)
+        updateBounds()
     }
 
     // Các hàm setter để thay đổi kiểu dáng từ Sub-tool

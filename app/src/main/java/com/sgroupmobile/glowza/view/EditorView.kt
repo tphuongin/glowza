@@ -30,6 +30,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private val drawPaths = mutableListOf<DrawItem>()
     private var currentPath: Path? = null
     private var currentDrawPaint: Paint? = null
+    var onDrawHistoryChanged: ((Boolean, Boolean) -> Unit)? = null
     private var brushColor = Color.parseColor("#F48FB1")
     private var brushSize = 20f
     private var isEraserMode = false
@@ -37,7 +38,8 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val imageBounds = RectF()
 
-    var onTextItemDoubleClicked: ((TextItem) -> Unit)? = null
+    var onTextItemClicked: ((TextItem) -> Unit)? = null
+    var onItemSelected: ((BaseItem?) -> Unit)? = null
 
     // Paint để vẽ Bitmap mượt hơn
     private val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
@@ -58,6 +60,7 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val last = drawPaths.removeAt(drawPaths.size - 1)
             redoPaths.add(last)
             invalidate()
+            notifyDrawHistory()
         }
     }
     fun setFramePreview(bitmap: Bitmap?) {
@@ -77,6 +80,9 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         }
 
         invalidate()
+    }
+    private fun notifyDrawHistory() {
+        onDrawHistoryChanged?.invoke(drawPaths.isNotEmpty(), redoPaths.isNotEmpty())
     }
     init {
         // Ép View vẽ bằng Software để không bị giới hạn 100MB của Canvas phần cứng
@@ -103,16 +109,39 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private val gestureDetector =
         GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                val hitItem = items.findLast { it.containsPoint(e.x, e.y) }
-                if (hitItem is TextItem) {
-                    onTextItemDoubleClicked?.invoke(hitItem)
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                val clickedItem = findItemAtPoint(e.x, e.y)
+                if (clickedItem is TextItem) {
+                    onTextItemClicked?.invoke(clickedItem)
                     return true
                 }
-                return false
+                return super.onSingleTapConfirmed(e)
             }
         })
+    private fun findItemAtPoint(touchX: Float, touchY: Float): BaseItem? {
+        for (i in items.indices.reversed()) {
+            val item = items[i]
+            if (item is DrawItem) continue
 
+            val inverseMatrix = Matrix()
+            if (item.matrix.invert(inverseMatrix)) {
+                val touchPoints = floatArrayOf(touchX, touchY)
+                inverseMatrix.mapPoints(touchPoints)
+
+                val localX = touchPoints[0]
+                val localY = touchPoints[1]
+                val w = item.getWidth()
+                val h = item.getHeight()
+
+                val p = 10f
+
+                val isInside = localX >= -p && localX <= (w + p) && localY >= -p && localY <= (h + p)
+
+                if (isInside) return item
+            }
+        }
+        return null
+    }
     fun setDrawMode(enabled: Boolean) {
         this.isDrawMode = enabled
         if (enabled) {
@@ -134,11 +163,13 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             val lastRedo = redoPaths.removeAt(redoPaths.size - 1)
             drawPaths.add(lastRedo)
             invalidate()
+            notifyDrawHistory()
         }
     }
     fun clearAllDraw() {
         drawPaths.clear()
         invalidate()
+        notifyDrawHistory()
     }
 
     fun setBaseBitmap(bitmap: Bitmap) {
@@ -282,9 +313,11 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                     items.add(hitItem)
 
                     touchMode = MODE_DRAG
+                    onItemSelected?.invoke(selectedItem)
                 } else {
                     selectedItem = null
                     items.forEach { it.isSelected = false }
+                    onItemSelected?.invoke(null)
                 }
 
                 lastX = x
@@ -363,9 +396,12 @@ class EditorView(context: Context, attrs: AttributeSet) : View(context, attrs) {
             }
             MotionEvent.ACTION_UP -> {
                 currentPath?.let { path ->
-                    currentDrawPaint?.let { paint -> drawPaths.add(DrawItem(path, paint)) }
+                    currentDrawPaint?.let { paint ->
+                        drawPaths.add(DrawItem(path, paint))
+                    }
                 }
                 currentPath = null
+                notifyDrawHistory()
             }
         }
         invalidate()

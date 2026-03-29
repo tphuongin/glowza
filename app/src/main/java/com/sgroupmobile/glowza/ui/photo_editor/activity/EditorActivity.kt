@@ -1,13 +1,19 @@
 package com.sgroupmobile.glowza.ui.photo_editor.activity
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -34,6 +40,7 @@ import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
 import com.sgroupmobile.glowza.databinding.ActivityEditorBinding
 import com.sgroupmobile.glowza.databinding.ItemTabToolBinding
+import com.sgroupmobile.glowza.databinding.LayoutDialogCustomConfirmBinding
 import com.sgroupmobile.glowza.databinding.LayoutDialogEditTextBinding
 import com.sgroupmobile.glowza.extension.toBitmap
 import com.sgroupmobile.glowza.provider.EditorToolProvider
@@ -43,6 +50,7 @@ import com.sgroupmobile.glowza.ui.photo_editor.fragment.DrawSubToolFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.StickerBottomSheetFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.TextSubToolFragment
 import com.sgroupmobile.glowza.util.FilterUtils
+import com.sgroupmobile.glowza.util.saveImageToGallery
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -62,6 +70,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         setupMainTabs()
         setupListeners()
         handleIntentData()
+        setupInset(binding.adjustView)
     }
 
     override fun setupObservers() {
@@ -70,6 +79,11 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 launch {
                     viewModel.previewBitmap.collectLatest { bitmap ->
                         bitmap?.let { binding.editorView.setBaseBitmap(it) }
+                    }
+                }
+                launch {
+                    viewModel.formattedBitmap.collectLatest { bitmap ->
+                        bitmap?.let { binding.editorViewOrigin.setBaseBitmap(it) }
                     }
                 }
                 launch {
@@ -86,7 +100,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 }
 
                 launch {
-                    viewModel.currentTool.collectLatest { type ->
+                    viewModel.currentTool.collect { type ->
                         if (type != null) {
                             handleToolChange(type)
                         } else {
@@ -104,6 +118,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                                 putExtra("SAVED_IMAGE_URI", it.toString())
                             }
                             startActivity(intent)
+                            viewModel.resetExportStatus()
                         }
                     }
                 }
@@ -111,7 +126,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
     }
     private fun updateNavigationUI(state: EditorViewModel.NavigationState) {
-        val activeColor = ContextCompat.getColor(this, R.color.primary)
+        val activeColor = ContextCompat.getColor(this, R.color.onBackground)
         val inactiveColor = "#9E9E9E".toColorInt()
 
         binding.btnUndo.apply {
@@ -133,7 +148,6 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
     }
 
-
     fun confirmPendingAction() {
         when(pendingAction){
             is EditorAction.Frame ->{
@@ -154,7 +168,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
     }
 
-
+    @SuppressLint("ClickableViewAccessibility")
     override fun setupListeners() {
         super.setupListeners()
         binding.btnSave.setOnClickListener {
@@ -162,22 +176,70 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
 
         binding.btnBack.setOnClickListener {
-
-            if (binding.subToolContainer.isVisible) {
-                cancelPendingAction()
-                closeSubTool()
-            } else {
-                finish()
-            }
+            confirmExit()
         }
-        binding.editorView.onTextItemDoubleClicked = { textItem ->
+        binding.editorView.onTextItemClicked = { textItem ->
             showEditTextDialog(textItem)
+        }
+        binding.editorView.onItemSelected = { selectedItem ->
+            // Kiểm tra xem TextSubToolFragment có đang hiển thị không
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.sub_tool_container)
+            if (currentFragment is TextSubToolFragment && selectedItem is TextItem) {
+                // Nếu đúng là đang mở tab Text và đang chọn TextItem, thì cập nhật target
+                currentFragment.setTargetItem(selectedItem)
+            }
         }
 
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnRedo.setOnClickListener { viewModel.redo() }
+
+        binding.btnCompare.setOnTouchListener { _, event ->
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    binding.editorView.visibility = View.GONE
+                    binding.editorViewOrigin.visibility = View.VISIBLE
+                    binding.btnCompare.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray))
+                    return@setOnTouchListener true
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    binding.editorView.visibility = View.VISIBLE
+                    binding.editorViewOrigin.visibility = View.GONE
+                    binding.btnCompare.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.onBackground))
+                    return@setOnTouchListener true
+                }
+                else -> return@setOnTouchListener false
+            }
+        }
+
     }
 
+    private fun confirmExit() {
+        val dialogBinding = LayoutDialogCustomConfirmBinding.inflate(layoutInflater)
+
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // lấy thông số kích thước màn hình điện thoại
+        val displayMetrics = resources.displayMetrics
+        val dialogWidth = (displayMetrics.widthPixels * 0.85).toInt()
+        dialog.window?.setLayout(
+            dialogWidth,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        dialogBinding.btnStay.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnDiscard.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
+    }
     private fun setupMainTabs() {
         val tabLayout = binding.tabLayoutEditorTools
         val tools = EditorToolProvider.getPublicTools()
@@ -198,37 +260,62 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                updateTabStyle(tab, true)
                 val tool = tab?.tag as? EditorTool ?: return
+                if (pendingAction != null) {
+                    cancelPendingAction()
+                }
+
+                binding.editorView.setDrawMode(false)
+
+                updateTabStyle(tab, true)
 
                 when (tool.type) {
-                    ToolType.CROP -> showCropSubTool()
-                    ToolType.FILTER -> openAssetSheet("Chọn Bộ Lọc", "filters")
-                    ToolType.STICKER -> openAssetSheet("Chọn Nhãn Dán", "stickers")
-                    ToolType.FRAME -> openAssetSheet("Chọn Khung Hình", "frames")
-                    else -> viewModel.selectTool(tool.type)
+                    // Nhóm dùng Sheet/Activity: Phải ép ẩn khung Fragment đi
+                    ToolType.CROP, ToolType.FILTER, ToolType.STICKER, ToolType.FRAME -> {
+                        binding.subToolContainer.visibility = View.GONE
+
+                        when (tool.type) {
+                            ToolType.CROP -> showCropSubTool()
+                            ToolType.FILTER -> openAssetSheet(getString(R.string.title_choose_filter), "filters")
+                            ToolType.STICKER -> openAssetSheet(getString(R.string.title_choose_sticker), "stickers")
+                            ToolType.FRAME -> openAssetSheet(getString(R.string.title_choose_frame), "frames")
+                            else -> {}
+                        }
+                    }
+                    else -> {
+                        lifecycleScope.launch {
+                            viewModel.selectTool(tool.type)
+                        }
+                    }
                 }
             }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) = updateTabStyle(tab, false)
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                updateTabStyle(tab, false)
+            }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
                 val tool = tab?.tag as? EditorTool ?: return
-                if (tool.type == ToolType.CROP || tool.type == ToolType.FILTER ||
-                    tool.type == ToolType.STICKER || tool.type == ToolType.FRAME) {
+
+                if (tool.type in listOf(ToolType.CROP, ToolType.FILTER, ToolType.STICKER, ToolType.FRAME)) {
                     onTabSelected(tab)
                 } else {
                     if (binding.subToolContainer.isVisible) {
-                        viewModel.resetTool()
+                        cancelPendingAction()
+                        lifecycleScope.launch {
+                            viewModel.resetTool()
+                        }
                     } else {
                         binding.subToolContainer.visibility = View.VISIBLE
                         updateTabStyle(tab, true)
+                        lifecycleScope.launch {
+                            viewModel.selectTool(tool.type)
+                        }
                     }
                 }
             }
         })
     }
-
     fun getPendingAction(): EditorAction? = pendingAction
 
 
@@ -243,7 +330,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         if (supportFragmentManager.findFragmentByTag("AssetSheet") != null) return
 
         if (type == "filters") {
-            viewModel.prepareFilterPreviews()
+            viewModel.prepareFilterPreviews(this)
         }
 
         val sheet = StickerBottomSheetFragment.Companion.newInstance(title, type) { id ->
@@ -258,7 +345,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         val bitmap = BitmapFactory.decodeResource(resources, id)
         when (type) {
             "filters" -> {
-                val matrix = FilterUtils.getMatrixById(id)
+                val matrix = FilterUtils.getMatrixById(id, this)
                 matrix?.let {
                     binding.editorView.setFilter(it)
                     pendingAction = EditorAction.Filter(it)
@@ -292,21 +379,42 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
     private fun startUCrop(sourceUri: Uri) {
         val fileName = "Glowza_Edited_${System.currentTimeMillis()}.jpg"
         val destinationUri = Uri.fromFile(File(cacheDir, fileName))
+
         val options = UCrop.Options().apply {
             setCompressionQuality(90)
+
+            // Cụm nền
             setToolbarColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
             setStatusBarColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
-            setToolbarWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.primary))
+            setRootViewBackgroundColor(ContextCompat.getColor(this@EditorActivity, R.color.background))
+
+            //Cụm chữ & Icon
+            setToolbarWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.onBackground))
+
+            //Điểm nhấn (Accent)
             setActiveControlsWidgetColor(ContextCompat.getColor(this@EditorActivity, R.color.primary))
-            setLogoColor(Color.TRANSPARENT)
+            setCropFrameColor(ContextCompat.getColor(this@EditorActivity, R.color.white))
+            setCropGridColor(ContextCompat.getColor(this@EditorActivity, R.color.white))
+
+            setLogoColor(android.graphics.Color.TRANSPARENT)
+            setHideBottomControls(false)
+
             setFreeStyleCropEnabled(true)
+
+            val cropTitle = getString(R.string.title_crop_image)
+            setToolbarTitle(cropTitle)
         }
-        UCrop.of(sourceUri, destinationUri).withOptions(options).start(this)
+
+        UCrop.of(sourceUri, destinationUri)
+            .withOptions(options)
+            .start(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.resetTool()
+        lifecycleScope.launch {
+            viewModel.resetTool()
+        }
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             val resultUri = UCrop.getOutput(data!!)
             resultUri?.toBitmap(this)?.let { bitmap ->
@@ -345,12 +453,14 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
     fun closeSubTool() {
         pendingAction = null // Xóa bỏ mọi pending đang treo
-        viewModel.resetTool() // Bắn tin hiệu để ẩn sub_tool_container
+        lifecycleScope.launch {
+            viewModel.resetTool()
+        }
     }
 
     private fun handleToolChange(type: ToolType) {
-
         binding.editorView.setDrawMode(type == ToolType.DRAW)
+        binding.subToolContainer.visibility = View.GONE
         when (type) {
             ToolType.ADJUST -> showAdjustmentSubTool()
             ToolType.TEXT -> {
@@ -382,11 +492,20 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         closeSubTool()
     }
     private fun showDrawSubTool() = replaceSubToolFragment(DrawSubToolFragment().apply {
-        onDrawConfigChanged = { color, size, isEraser -> binding.editorView.setBrushConfig(color, size, isEraser) }
+        onDrawConfigChanged = { color, size, isEraser ->
+            binding.editorView.setBrushConfig(color, size, isEraser)
+        }
         onUndoClicked = { binding.editorView.undoLastDraw() }
         onClearClicked = { binding.editorView.clearAllDraw() }
         onRedoClicked = { binding.editorView.redoLastDraw() }
+
+        binding.editorView.onDrawHistoryChanged = { canUndo, canRedo ->
+            if (isAdded && view != null) {
+                updateUndoRedoUI(canUndo, canRedo)
+            }
+        }
     })
+
     private fun showEditTextDialog(textItem: TextItem) {
         val dialog = Dialog(this)
         val bindingDialog = LayoutDialogEditTextBinding.inflate(layoutInflater)
@@ -433,15 +552,13 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         } else {
             val newItem = TextItem("Glowza").apply {
                 id = System.currentTimeMillis()
-                textPaint.apply {
-                    color = Color.WHITE
-                    textSize = 100f
-                    isAntiAlias = true
-                }
+                setTextColor(Color.WHITE)
+                setTextSize(100f)
+                textPaint.isAntiAlias = true
             }
             viewModel.addNewItem(newItem)
 
-            // CẬP NHẬT: Thêm currentDisplayMatrix vào đây để Engine không bị lỗi
+            // Thêm currentDisplayMatrix vào đây để Engine không bị lỗi
             viewModel.addAction(
                 EditorAction.Text(
                 newItem.text,
@@ -498,7 +615,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         val view = tab?.customView ?: return
         val icon = view.findViewById<ImageView>(R.id.tabIcon)
         val text = view.findViewById<TextView>(R.id.tabText)
-        val color = if (isSelected) ContextCompat.getColor(this, R.color.primary) else "#9E9E9E".toColorInt()
+        val color = if (isSelected) ContextCompat.getColor(this, R.color.primary) else ContextCompat.getColor(this, R.color.onBackground)
         icon.setColorFilter(color)
         text.setTextColor(color)
     }

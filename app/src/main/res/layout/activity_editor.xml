@@ -22,11 +22,36 @@
             android:scaleType="fitCenter" />
 
         <com.sgroupmobile.glowza.view.EditorView
+            android:id="@+id/editor_view_origin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <com.sgroupmobile.glowza.view.EditorView
             android:id="@+id/editor_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btn_compare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_compare"
+            android:background="@null"
+            app:tint="@color/onBackground"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/normal_padding"
+            />
+
+
     </FrameLayout>
+
+    <View
+        android:id="@+id/adjust_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageButton
         android:id="@+id/btn_back"
@@ -34,9 +59,10 @@
         android:layout_height="@dimen/editor_control_size"
         android:layout_margin="@dimen/editor_control_margin"
         android:src="@drawable/exit"
+        android:layout_marginTop="-15dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:tint="@color/onSurface"
-        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/onBackground"
+        app:layout_constraintTop_toBottomOf="@id/adjust_view"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
@@ -46,7 +72,8 @@
         android:layout_margin="@dimen/editor_control_margin"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_back"
+        app:layout_constraintBottom_toBottomOf="@id/btn_back"
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
@@ -69,14 +96,21 @@
             android:id="@+id/btn_save"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="35dp"
             android:layout_marginStart="12dp"
             android:text="@string/btn_save"
-            android:textSize="12sp"
+            android:textSize="16sp"
             android:backgroundTint="@color/primary"
+            android:fontFamily="@font/regular"
             app:cornerRadius="20dp"
+            app:iconTint="@color/white"
+            android:textColor="@color/white"
             app:icon="@drawable/ic_save"
-            app:iconSize="16dp" />
+            app:iconSize="20dp"
+
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingVertical="0dp" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -91,7 +125,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/main_toolbar_card"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -100,7 +134,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/editor_toolbar_height"
         android:layout_margin="@dimen/editor_toolbar_margin"
-        app:cardBackgroundColor="@color/surface"
+        app:cardBackgroundColor="@color/tertiary"
         app:cardCornerRadius="@dimen/editor_toolbar_radius"
         app:cardElevation="@dimen/editor_toolbar_elevation"
         app:layout_constraintBottom_toBottomOf="parent">

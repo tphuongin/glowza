@@ -74,4 +74,7 @@ object TextTemplateProvider {
             }
         )
     }
+
+    fun getFontList() = listOf("standard.ttf", "beauty.ttf", "bold_retro.ttf", "classic.ttf", "modern.ttf")
+
 }

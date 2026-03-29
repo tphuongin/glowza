@@ -108,7 +108,6 @@ class StickerBottomSheetFragment : BottomSheetDialogFragment() {
 
                 if (assetType == "stickers") {
                     (activity as? EditorActivity)?.confirmPendingAction()
-                    dismiss()
                 }
             }
         }

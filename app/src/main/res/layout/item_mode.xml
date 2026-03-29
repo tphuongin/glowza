@@ -3,12 +3,11 @@
     android:id="@+id/tvMode"
     android:layout_width="@dimen/mode_width"
     android:layout_height="match_parent"
-
+    android:maxLines="1"
+    android:ellipsize="end"
     android:text="@string/camera_mode"
-    android:textColor="#FFFFFF"
-    android:textSize="@dimen/content_text"
-    android:textStyle="bold"
-
+    android:textSize="14sp"
+    android:fontFamily="@font/bold"
     android:letterSpacing="0.1"
     android:gravity="center"
     android:paddingBottom="@dimen/small_padding"

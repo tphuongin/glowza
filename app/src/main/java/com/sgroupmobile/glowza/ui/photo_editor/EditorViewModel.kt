@@ -1,6 +1,7 @@
 package com.sgroupmobile.glowza.ui.photo_editor
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -26,6 +27,10 @@ import androidx.lifecycle.viewModelScope
 import com.sgroupmobile.glowza.base.BaseItem
 import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
+import dagger.hilt.android.internal.Contexts
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -35,6 +40,8 @@ class EditorViewModel @Inject constructor(
     private val application: Application
 ) : BaseViewModel() {
     private var originalBitmap: Bitmap? = null
+    private var _formattedBitmap = MutableStateFlow<Bitmap?>(null)
+    val formattedBitmap: StateFlow<Bitmap?> = _formattedBitmap.asStateFlow()
     private var editorEngine: EditorEngine? = null
 
     // Ảnh hiển thị cuối cùng sau khi render xong các layer
@@ -46,9 +53,8 @@ class EditorViewModel @Inject constructor(
     val itemList = _itemList.asStateFlow()
     private val _exportStatus = MutableStateFlow<Uri?>(null)
     val exportStatus = _exportStatus.asStateFlow()
-    private val _currentTool = MutableStateFlow<ToolType?>(null)
-    val currentTool = _currentTool.asStateFlow()
-
+    private val _currentTool = MutableSharedFlow<ToolType?>()
+    val currentTool = _currentTool.asSharedFlow()
     private val _currentUri = MutableStateFlow<Uri?>(null)
     val currentUri = _currentUri.asStateFlow()
 
@@ -102,6 +108,7 @@ class EditorViewModel @Inject constructor(
                     loadedBitmap?.let {
                         editorEngine = EditorEngine(it)
                         _previewBitmap.value = it
+                        _formattedBitmap.value = it
                     }
                     updateLoading()
                 }
@@ -225,16 +232,15 @@ class EditorViewModel @Inject constructor(
     }
 
 
-    fun prepareFilterPreviews() {
+    fun prepareFilterPreviews(context: Context) {
         val originalBitmap = originalBitmap ?: return
 
         launch(Dispatchers.Default) {
             // Bước 1: Tạo thumbnail nhỏ (150x150) để tránh lag và tốn RAM
             val thumbSize = 150
             val thumbnail = createCenterCropThumbnail(originalBitmap, thumbSize)
-
             // Bước 2: Lấy danh sách Filter từ Utils
-            val filters = FilterUtils.getListImageFilter()
+            val filters = FilterUtils.getListImageFilter(context)
 
             // Bước 3: Chạy vòng lặp áp dụng từng Filter lên thumbnail
             filters.forEach { filter ->
@@ -304,12 +310,12 @@ class EditorViewModel @Inject constructor(
         _navigationState.value = NavigationState(false, false)
     }
 
-    fun selectTool(type: ToolType? = null) {
-        _currentTool.value = type
+    suspend fun selectTool(type: ToolType? = null) {
+        _currentTool.emit(type)
     }
 
-    fun resetTool() {
-        _currentTool.value = null
+    suspend fun resetTool() {
+        _currentTool.emit(null)
     }
 
     fun saveImage() {
@@ -344,5 +350,8 @@ class EditorViewModel @Inject constructor(
                 }
             }
         }
+    }
+    fun resetExportStatus(){
+        _exportStatus.value = null
     }
 }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background"
+    android:background="#B0000000"
     tools:context=".ui.camera.fragment.ImagePreviewFragment">
 
     <ImageView
@@ -35,6 +35,7 @@
         app:layout_constraintBottom_toBottomOf="@id/btn_edit"
         android:src="@drawable/back"
         android:layout_marginStart="@dimen/normal_padding"
+        android:padding="6dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn_edit"
         android:background="@android:color/transparent"/>
@@ -46,6 +47,7 @@
         app:layout_constraintTop_toTopOf="@id/btn_edit"
         app:layout_constraintBottom_toBottomOf="@id/btn_edit"
         android:layout_marginEnd="@dimen/normal_padding"
+        android:padding="6dp"
         android:src="@drawable/download"
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@android:color/transparent"/>

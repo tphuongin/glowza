@@ -1,6 +1,8 @@
 package com.sgroupmobile.glowza.util
 
+import android.content.Context
 import android.graphics.ColorMatrix
+import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.data.model.ImageFilter
 
 
@@ -80,24 +82,19 @@ object FilterUtils {
         ))
         return matrix
     }
-
-
-    fun getListImageFilter(): List<ImageFilter> {
+    fun getListImageFilter(context: Context): List<ImageFilter> {
         return listOf(
-            ImageFilter(101, "Gốc", getOriginal()),
-            ImageFilter(102, "Trắng đen", getGrayScale()),
-            ImageFilter(103, "Cổ điển", getSepia()),
-            ImageFilter(104, "Vintage", getVintage()),
-            ImageFilter(105, "Lạnh", getCold()),
-            ImageFilter(106, "Ấm áp", getWarm()),
-            ImageFilter(107, "Polaroid", getPolaroid()),
-            ImageFilter(108, "Điện ảnh", getCinematic()),
-            ImageFilter(109, "Độ tương phản", getHighContrast())
+            ImageFilter(102, context.getString(R.string.filter_grayscale), getGrayScale()),
+            ImageFilter(103, context.getString(R.string.filter_sepia), getSepia()),
+            ImageFilter(104, context.getString(R.string.filter_vintage), getVintage()),
+            ImageFilter(105, context.getString(R.string.filter_cold), getCold()),
+            ImageFilter(106, context.getString(R.string.filter_warm), getWarm()),
+            ImageFilter(107, context.getString(R.string.filter_polaroid), getPolaroid()),
+            ImageFilter(108, context.getString(R.string.filter_cinematic), getCinematic()),
+            ImageFilter(109, context.getString(R.string.filter_high_contrast), getHighContrast())
         )
     }
-
-
-    fun getMatrixById(id: Int): ColorMatrix? {
-        return getListImageFilter().find { it.id == id }?.colorMatrix
+    fun getMatrixById(id: Int, context: Context): ColorMatrix? {
+        return getListImageFilter(context).find { it.id == id }?.colorMatrix
     }
 }

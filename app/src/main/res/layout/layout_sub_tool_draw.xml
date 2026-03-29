@@ -3,80 +3,136 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/surface"
+    android:background="@color/tertiary"
+    android:elevation="16dp"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:paddingBottom="108dp">
 
-    <com.google.android.material.slider.Slider
-        android:id="@+id/sliderBrushSize"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btn_cancel_draw"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/exit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onBackground" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bold"
+            android:text="@string/draw_title"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnConfirmDraw"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/ic_check"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onBackground" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#12000000" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/brushSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:valueFrom="5"
-        android:valueTo="100"
-        android:value="20"
-        app:thumbColor="@color/primary"
-        app:trackColorActive="@color/primary" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="16dp">
 
         <ImageButton
             android:id="@+id/btnEraser"
             android:layout_width="44dp"
             android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
             android:src="@drawable/ic_eraser"
-            app:tint="@color/onSurface"
-            android:alpha="0.6" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onSurfaceVariant" />
 
-        <View android:layout_width="1dp" android:layout_height="24dp" android:background="#DDD" android:layout_marginHorizontal="4dp"/>
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sliderBrushSize"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:valueFrom="5"
+            android:valueTo="100"
+            android:value="20"
+            app:labelBehavior="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnEraser"
+            app:layout_constraintTop_toTopOf="parent"
+            app:thumbColor="@color/primary"
+            app:thumbRadius="8dp"
+            app:trackColorActive="@color/primary"
+            app:trackColorInactive="@color/primaryContainer"
+            app:trackHeight="4dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="4dp"
+        android:paddingHorizontal="12dp">
+
+        <ImageButton
+            android:id="@+id/btnUndo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
+            android:src="@drawable/ic_undo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onSurfaceVariant" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvDrawColors"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-        <View android:layout_width="1dp" android:layout_height="24dp" android:background="#DDD" android:layout_marginHorizontal="4dp"/>
-
-        <ImageButton
-            android:id="@+id/btnUndo"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_undo"
-            app:tint="@color/onSurface" />
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnRedo"
+            app:layout_constraintStart_toEndOf="@+id/btnUndo"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/btnRedo"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="10dp"
             android:src="@drawable/ic_redo"
-            app:tint="@color/onSurface" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/onSurfaceVariant" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageButton
-            android:id="@+id/btnClearAll"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/exit"
-            app:tint="@color/error" />
-
-        <View android:layout_width="1dp" android:layout_height="24dp" android:background="#DDD" android:layout_marginHorizontal="4dp"/>
-
-        <ImageButton
-            android:id="@+id/btnConfirmDraw"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_check"
-            app:tint="@color/primary" />
-    </LinearLayout>
 </LinearLayout>

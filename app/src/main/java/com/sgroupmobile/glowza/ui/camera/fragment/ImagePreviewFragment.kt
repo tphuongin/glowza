@@ -1,5 +1,6 @@
 package com.sgroupmobile.glowza.ui.camera.fragment
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.sgroupmobile.glowza.R
+import com.sgroupmobile.glowza.ui.photo_editor.activity.EditorActivity
 import com.sgroupmobile.glowza.util.showFancySnackbar
 
 class ImagePreviewFragment : BaseFragment<FragmentImagePreviewBinding>() {
@@ -56,6 +58,15 @@ class ImagePreviewFragment : BaseFragment<FragmentImagePreviewBinding>() {
                         showFancySnackbar(getString(R.string.save_error), binding.root)
                     }
                 }
+            }
+        }
+        binding.btnEdit.setOnClickListener {
+            uri?.let { imageUri ->
+                val intent = Intent(requireContext(), EditorActivity::class.java).apply {
+                    putExtra(com.sgroupmobile.glowza.common.enums.Constants.EXTRA_IMAGE_URI, imageUri.toString())
+                }
+                startActivity(intent)
+                requireActivity().finish()
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.sgroupmobile.glowza.base
 
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,10 +29,25 @@ abstract class BaseActivity<VB: ViewBinding> : AppCompatActivity() {
     protected open fun initData() {}
     protected open fun setupObservers() {}
     protected open fun setupListeners() {}
-    protected open fun setupInset(){
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+    protected open fun setupInset(topView: View = binding.root, bottomView: View = binding.root){
+        ViewCompat.setOnApplyWindowInsetsListener(topView) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val topParams = topView.layoutParams as ViewGroup.MarginLayoutParams
+            topParams.setMargins(
+                systemBars.top,
+                systemBars.top,
+                systemBars.right,
+                0
+            )
+            topView.layoutParams = topParams
+            val params = bottomView.layoutParams as ViewGroup.MarginLayoutParams
+            params.setMargins(
+                systemBars.left,
+                0,
+                systemBars.right,
+                systemBars.bottom
+            )
+            bottomView.layoutParams = params
             insets
         }
     }

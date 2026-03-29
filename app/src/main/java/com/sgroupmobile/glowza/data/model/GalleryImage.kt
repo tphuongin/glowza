@@ -7,5 +7,6 @@ class GalleryImage (
     val uri: Uri,
     val dateAdded: Long,
     val isFavourite: Boolean,
-    val folderName: String
+    val folderName: String,
+    var isSelected: Boolean = false
 )

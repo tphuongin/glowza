@@ -41,8 +41,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.lottie)
     implementation(libs.ucrop)
     implementation(libs.glide)
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     kapt (libs.compiler)
     implementation(libs.gpuimage)
     implementation(libs.play.services.mlkit.face.detection)

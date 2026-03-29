@@ -18,9 +18,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chỉnh sửa nội dung"
+            android:text="@string/title_edit_text"
             android:textSize="20sp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/bold"
             android:textColor="@color/onSurface"
             android:layout_gravity="center"
             android:layout_marginBottom="24dp"/>
@@ -31,9 +31,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_edit_text_custom"
             android:gravity="start|center_vertical"
-            android:hint="Nhập nội dung tại đây..."
+            android:hint="@string/hint_enter_text"
             android:minHeight="54dp"
             android:padding="16dp"
+            android:fontFamily="@font/regular"
             android:textColor="@color/onSecondary"
             android:textSize="16sp" />
 
@@ -48,22 +49,23 @@
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="HỦY"
+                android:text="@string/action_cancel"
                 android:padding="12dp"
                 android:textColor="@color/onSurfaceVariant"
                 android:textSize="14sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/bold"
                 android:letterSpacing="0.05"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnConfirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="XÁC NHẬN"
+                android:text="@string/action_confirm"
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
                 android:background="@drawable/bg_button_primary"
                 android:textColor="@color/white"
+                android:textStyle="bold"
                 android:layout_marginStart="12dp"
                 android:elevation="4dp"/>
         </LinearLayout>

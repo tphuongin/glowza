@@ -2,15 +2,13 @@ package com.sgroupmobile.glowza.ui.photo_editor.fragment
 
 import android.graphics.Color
 import android.graphics.Typeface
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.databinding.LayoutSubToolTextBinding
 import com.sgroupmobile.glowza.data.model.TextItem
 import com.sgroupmobile.glowza.provider.ColorProvider
@@ -19,32 +17,54 @@ import com.sgroupmobile.glowza.ui.photo_editor.adapter.ColorAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.FontAdapter
 import com.sgroupmobile.glowza.ui.photo_editor.adapter.TemplateAdapter
 
-class TextSubToolFragment : Fragment() {
-    private var _binding: LayoutSubToolTextBinding? = null
-    private val binding get() = _binding!!
-
+class TextSubToolFragment : BaseFragment<LayoutSubToolTextBinding>() {
+    private var colorAdapter: ColorAdapter? = null
     var onStyleUpdated: (() -> Unit)? = null
     var onTemplateSelected: ((TextItem) -> Unit)? = null
 
     private var activeTextItem: TextItem? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = LayoutSubToolTextBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun provideBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        LayoutSubToolTextBinding.inflate(inflater, container, false)
+
+    override fun setupUI() {
+        setupTabs()
+        setupLists()
+
+        activeTextItem?.let { item ->
+            binding.sliderSize.value = item.textPaint.textSize.coerceIn(10f, 200f)
+            binding.sliderAlpha.value = item.textPaint.alpha.toFloat().coerceIn(0f, 255f)
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setupTabs()
+    override fun setupListeners() {
         setupStyleListeners()
-        setupLists()
+
+        binding.btnResetColor.setOnClickListener {
+            activeTextItem?.let { item ->
+                item.textPaint.shader = null
+                item.setTextColor(Color.WHITE)
+
+                colorAdapter?.resetSelection()
+
+                onStyleUpdated?.invoke()
+            }
+        }
     }
 
     fun setTargetItem(item: TextItem) {
         this.activeTextItem = item
-        _binding?.let {
-            it.sliderSize.value = item.textPaint.textSize.coerceIn(10f, 200f)
-            it.sliderAlpha.value = item.textPaint.alpha.toFloat().coerceIn(0f, 255f)
+        if (view != null) {
+            // Tạm thời gỡ bỏ listener để tránh trigger nhầm khi tự động set value
+            binding.sliderSize.clearOnChangeListeners()
+            binding.sliderAlpha.clearOnChangeListeners()
+
+            // Cập nhật giá trị thanh trượt theo chữ mới
+            binding.sliderSize.value = item.textPaint.textSize.coerceIn(10f, 200f)
+            binding.sliderAlpha.value = item.textPaint.alpha.toFloat().coerceIn(0f, 255f)
+
+            // Gắn lại listener
+            setupStyleListeners()
         }
     }
 
@@ -59,6 +79,7 @@ class TextSubToolFragment : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
     }
+
 
     private fun setupStyleListeners() {
         binding.sliderSize.addOnChangeListener { _, value, fromUser ->
@@ -77,15 +98,24 @@ class TextSubToolFragment : Fragment() {
     }
 
     private fun setupLists() {
+        // Màu sắc
         val colors = ColorProvider.getEditorColors()
         binding.rvColors.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvColors.adapter = ColorAdapter(colors) { colorStr ->
+        // Khởi tạo và gán vào biến toàn cục
+        colorAdapter = ColorAdapter(colors) { colorStr ->
+            activeTextItem?.textPaint?.shader = null
             activeTextItem?.setTextColor(Color.parseColor(colorStr))
             onStyleUpdated?.invoke()
         }
+        binding.rvColors.adapter = colorAdapter
 
-        val fonts = listOf("standard.ttf", "beauty.ttf", "bold_retro.ttf", "classic.ttf", "modern.ttf")
-        binding.rvFonts.layoutManager = LinearLayoutManager(requireContext())
+        // Font chữ
+        val fonts = TextTemplateProvider.getFontList()
+        binding.rvFonts.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        binding.rvFonts.setPadding(8, 8, 8, 8)
+        binding.rvFonts.clipToPadding = false
+
         binding.rvFonts.adapter = FontAdapter(fonts) { fontPath ->
             try {
                 val tf = Typeface.createFromAsset(requireContext().assets, "fonts/$fontPath")
@@ -96,6 +126,7 @@ class TextSubToolFragment : Fragment() {
             }
         }
 
+        // (Templates)
         val templates = TextTemplateProvider.getTemplates(requireContext().assets)
         binding.rvTemplates.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvTemplates.adapter = TemplateAdapter(templates) { template ->
@@ -107,10 +138,5 @@ class TextSubToolFragment : Fragment() {
                 onStyleUpdated?.invoke()
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

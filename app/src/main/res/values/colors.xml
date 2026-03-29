@@ -7,13 +7,14 @@
     <color name="onPrimaryContainer">#3A0F34</color>
 
     <!-- ===== SECONDARY ===== -->
-    <color name="secondary">#8FD3C7</color>
-    <color name="onSecondary">#003731</color>
-    <color name="secondaryContainer">#D6F3EE</color>
-    <color name="onSecondaryContainer">#00201C</color>
+    <color name="secondary">#1E1E1E</color>
+    <color name="onSecondary">#2A1A3A</color>
+
+    <color name="secondaryContainer">#CCF3D7EC</color>
+    <color name="onSecondaryContainer">#3A0F34</color>
 
     <!-- ===== TERTIARY (tuỳ chọn accent phụ) ===== -->
-    <color name="tertiary">#F2A97E</color>
+    <color name="tertiary">#F5F7FA</color>
     <color name="onTertiary">#4A1F00</color>
     <color name="tertiaryContainer">#FFDCC8</color>
     <color name="onTertiaryContainer">#2F1400</color>
@@ -25,7 +26,7 @@
     <!-- ===== SURFACE ===== -->
     <color name="surface">#FFF8FB</color>
     <color name="onSurface">#1F1A1D</color>
-    <color name="surfaceVariant">#F0E0EC</color>
+    <color name="surfaceVariant">#BDBDBD</color>
     <color name="onSurfaceVariant">#4F444B</color>
 
     <!-- ===== OUTLINE / DIVIDER ===== -->
@@ -38,5 +39,5 @@
     <color name="onErrorContainer">#FFDAD6</color>
 
     <color name="white">#FFFFFF</color>
-
+    <color name="gray">#DCDCDC</color>
 </resources>

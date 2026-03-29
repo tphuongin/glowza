@@ -15,13 +15,10 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.video.VideoRecordEvent
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -73,7 +70,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     private var isRecording = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        permissionHelper = PermissionHelper(requireActivity() as AppCompatActivity)
+        permissionHelper = PermissionHelper(this, requireContext())
     }
 
     override fun provideBinding(
@@ -82,13 +79,6 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
     ): FragmentCameraBinding = FragmentCameraBinding.inflate(inflater, container, false)
 
     override fun setupUI() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.btnExit) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val params = v.layoutParams as ViewGroup.MarginLayoutParams
-            params.topMargin = systemBars.top
-            v.layoutParams = params
-            insets
-        }
         binding.rvModeCamera.layoutManager = LinearLayoutManager(requireContext(),
             LinearLayoutManager.HORIZONTAL, false)
         snapHelper.attachToRecyclerView(binding.rvModeCamera)
@@ -97,8 +87,10 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
 
         val padding = (recyclerWidth - itemWidth) / 2
 
-        binding.rvModeCamera.setPadding(padding, 0, padding, 0)
+        binding.rvModeCamera.setPadding(padding, 70, padding, 0)
+        setupInset(binding.btnExit, binding.rvModeCamera)
     }
+
 
     override fun initData() {
         filterHelper = FilterHelper(requireContext())
@@ -248,6 +240,9 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
                 }
             }
         })
+        binding.btnExit.setOnClickListener {
+            requireActivity().finish()
+        }
     }
     private fun formatDuration(seconds: Long): String {
         val minutes = seconds / 60
@@ -293,7 +288,7 @@ class CameraFragment : BaseFragment<FragmentCameraBinding>() {
             // Flash Observer
             launch {
                 cameraViewModel.flash.collect { isFlashOn ->
-                    val src = if (isFlashOn) R.drawable.flash else R.drawable.no_flash
+                    val src = if (isFlashOn) R.drawable.ic_flash else R.drawable.ic_flash_off
                     binding.btnFlash.setImageResource(src)
                 }
             }

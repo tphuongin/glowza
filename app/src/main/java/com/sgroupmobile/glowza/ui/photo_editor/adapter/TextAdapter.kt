@@ -1,16 +1,21 @@
 package com.sgroupmobile.glowza.ui.photo_editor.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.data.model.TextItem
+import com.sgroupmobile.glowza.databinding.ItemFontBinding
 
 
 class ColorAdapter(
@@ -30,6 +35,16 @@ class ColorAdapter(
     }
 
     override fun getItemCount() = colors.size
+    @SuppressLint("NotifyDataSetChanged")
+    fun resetSelection() {
+        selectedPosition = 0
+        notifyDataSetChanged()
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearSelection() {
+        selectedPosition = -1
+        notifyDataSetChanged()
+    }
 
     override fun onBindViewHolder(h: ColorVH, position: Int) {
         val colorCode = colors[position]
@@ -41,42 +56,81 @@ class ColorAdapter(
         h.viewSelected.isVisible = (position == selectedPosition)
 
         h.itemView.setOnClickListener {
-            val oldPosition = selectedPosition
-            selectedPosition = h.adapterPosition
-
-            notifyItemChanged(oldPosition)
-            notifyItemChanged(selectedPosition)
-
-            onClick(colorCode)
+            if (selectedPosition != h.adapterPosition) {
+                val oldPosition = selectedPosition
+                selectedPosition = h.adapterPosition
+                notifyItemChanged(oldPosition)
+                notifyItemChanged(selectedPosition)
+                onClick(colorCode)
+            }
         }
     }
 }
+class FontAdapter(
+    private val fonts: List<String>,
+    private val onItemClick: (String) -> Unit
+) : RecyclerView.Adapter<FontAdapter.FontViewHolder>() {
 
-class FontAdapter(private val fonts: List<String>, private val onClick: (String) -> Unit) :
-    RecyclerView.Adapter<FontAdapter.FontVH>() {
-    private val fontCache = mutableMapOf<String, Typeface>()
-    class FontVH(v: View) : RecyclerView.ViewHolder(v) {
-        val tvFont: TextView = v.findViewById(R.id.tvFontName)
-    }
+    private var selectedPosition = -1
 
-    override fun onCreateViewHolder(p: ViewGroup, t: Int) =
-        FontVH(LayoutInflater.from(p.context).inflate(R.layout.item_font_row, p, false))
+    inner class FontViewHolder(val binding: ItemFontBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(fontPath: String, position: Int) {
+            val context = itemView.context
 
-    override fun getItemCount() = fonts.size
-
-    override fun onBindViewHolder(h: FontVH, p: Int) {
-        val fontPath = fonts[p]
-        h.tvFont.text = fontPath.removeSuffix(".ttf").replaceFirstChar { it.uppercase() }
-
-        val tf = fontCache.getOrPut(fontPath) {
+            val fontName = fontPath.replace(".ttf", "")
+                .split("_")
+                .joinToString(" ") { word ->
+                    word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                }
+            binding.tvFontName.text = fontName
             try {
-                Typeface.createFromAsset(h.itemView.context.assets, "fonts/$fontPath")
+                val typeface = Typeface.createFromAsset(context.assets, "fonts/$fontPath")
+                binding.tvFontPreview.typeface = typeface
             } catch (e: Exception) {
-                Typeface.DEFAULT
+                e.printStackTrace()
+            }
+
+            if (position == selectedPosition) {
+                binding.root.strokeColor = ContextCompat.getColor(context, R.color.primary)
+                binding.root.strokeWidth = 4 // Đơn vị px (~1.5dp)
+                binding.tvFontName.setTextColor(ContextCompat.getColor(context, R.color.primary))
+            } else {
+                // Trạng thái bình thường: Viền xám nhạt 1dp
+                binding.root.strokeColor = Color.parseColor("#E0E0E0")
+                binding.root.strokeWidth = 2
+                binding.tvFontName.setTextColor(Color.parseColor("#888888"))
+            }
+
+            binding.root.setOnClickListener {
+                val previousPosition = selectedPosition
+                selectedPosition = adapterPosition
+
+                notifyItemChanged(previousPosition)
+                notifyItemChanged(selectedPosition)
+
+                onItemClick(fontPath)
             }
         }
-        h.tvFont.typeface = tf
-        h.itemView.setOnClickListener { onClick(fontPath) }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FontViewHolder {
+        val binding = ItemFontBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FontViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: FontViewHolder, position: Int) {
+        holder.bind(fonts[position], position)
+    }
+
+    override fun getItemCount(): Int = fonts.size
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setSelectedFont(fontPath: String) {
+        val index = fonts.indexOf(fontPath)
+        if (index != -1 && index != selectedPosition) {
+            selectedPosition = index
+            notifyDataSetChanged()
+        }
     }
 }
 
@@ -92,6 +146,7 @@ class TemplateAdapter(private val items: List<TextItem>, private val onClick: (T
 
     override fun getItemCount() = items.size
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onBindViewHolder(h: TemplateVH, p: Int) {
         val item = items[p]
         val tv = h.tvPreview
