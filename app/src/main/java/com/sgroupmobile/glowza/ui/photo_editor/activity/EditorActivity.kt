@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Matrix
@@ -12,6 +13,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -48,6 +50,7 @@ import com.sgroupmobile.glowza.ui.photo_editor.fragment.DrawSubToolFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.StickerBottomSheetFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.TextSubToolFragment
 import com.sgroupmobile.glowza.util.FilterUtils
+import com.sgroupmobile.glowza.util.saveImageToGallery
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -76,6 +79,11 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
                 launch {
                     viewModel.previewBitmap.collectLatest { bitmap ->
                         bitmap?.let { binding.editorView.setBaseBitmap(it) }
+                    }
+                }
+                launch {
+                    viewModel.formattedBitmap.collectLatest { bitmap ->
+                        bitmap?.let { binding.editorViewOrigin.setBaseBitmap(it) }
                     }
                 }
                 launch {
@@ -140,7 +148,6 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
         }
     }
 
-
     fun confirmPendingAction() {
         when(pendingAction){
             is EditorAction.Frame ->{
@@ -161,7 +168,7 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
     }
 
-
+    @SuppressLint("ClickableViewAccessibility")
     override fun setupListeners() {
         super.setupListeners()
         binding.btnSave.setOnClickListener {
@@ -185,7 +192,28 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
 
         binding.btnUndo.setOnClickListener { viewModel.undo() }
         binding.btnRedo.setOnClickListener { viewModel.redo() }
+
+        binding.btnCompare.setOnTouchListener { _, event ->
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    binding.editorView.visibility = View.GONE
+                    binding.editorViewOrigin.visibility = View.VISIBLE
+                    binding.btnCompare.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.gray))
+                    return@setOnTouchListener true
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    binding.editorView.visibility = View.VISIBLE
+                    binding.editorViewOrigin.visibility = View.GONE
+                    binding.btnCompare.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.onBackground))
+                    return@setOnTouchListener true
+                }
+                else -> return@setOnTouchListener false
+            }
+        }
+
     }
+
     private fun confirmExit() {
         val dialogBinding = LayoutDialogCustomConfirmBinding.inflate(layoutInflater)
 

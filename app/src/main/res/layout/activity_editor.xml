@@ -22,10 +22,29 @@
             android:scaleType="fitCenter" />
 
         <com.sgroupmobile.glowza.view.EditorView
+            android:id="@+id/editor_view_origin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <com.sgroupmobile.glowza.view.EditorView
             android:id="@+id/editor_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/btn_compare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_compare"
+            android:background="@null"
+            app:tint="@color/onBackground"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/normal_padding"
+            />
+
+
     </FrameLayout>
 
     <View

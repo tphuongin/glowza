@@ -29,6 +29,7 @@ import com.sgroupmobile.glowza.data.model.StickerItem
 import com.sgroupmobile.glowza.data.model.TextItem
 import dagger.hilt.android.internal.Contexts
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +40,8 @@ class EditorViewModel @Inject constructor(
     private val application: Application
 ) : BaseViewModel() {
     private var originalBitmap: Bitmap? = null
+    private var _formattedBitmap = MutableStateFlow<Bitmap?>(null)
+    val formattedBitmap: StateFlow<Bitmap?> = _formattedBitmap.asStateFlow()
     private var editorEngine: EditorEngine? = null
 
     // Ảnh hiển thị cuối cùng sau khi render xong các layer
@@ -105,6 +108,7 @@ class EditorViewModel @Inject constructor(
                     loadedBitmap?.let {
                         editorEngine = EditorEngine(it)
                         _previewBitmap.value = it
+                        _formattedBitmap.value = it
                     }
                     updateLoading()
                 }
