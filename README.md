@@ -4,7 +4,7 @@ Glowza is an Android application built with Kotlin, Jetpack libraries, CameraX, 
 
 ## Demo
 
-[▶ Watch Demo Video](https://drive.google.com/file/d/FILE_ID/view?usp=sharing)
+[▶ Watch Demo Video](https://drive.google.com/drive/folders/1rB_jynpGaiyz26SZ4R_8pHQSBa2DClAV)
 
 ## Project structure
 
