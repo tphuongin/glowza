@@ -7,5 +7,5 @@ data class FunctionItem(
     val isBig: Boolean = false,
 )
 enum class FunctionType {
-    EDIT, CAMERA, IMAGE, PHOTO_COLLAGE, PHOTOBOOTH, VIDEO
+    EDIT, CAMERA, IMAGES, PHOTO_COLLAGE, PHOTOBOOTH, VIDEOS
 }

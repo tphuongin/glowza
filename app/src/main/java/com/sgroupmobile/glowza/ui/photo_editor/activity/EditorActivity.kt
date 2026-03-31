@@ -1,7 +1,6 @@
 package com.sgroupmobile.glowza.ui.photo_editor.activity
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -11,8 +10,6 @@ import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
@@ -50,7 +47,6 @@ import com.sgroupmobile.glowza.ui.photo_editor.fragment.DrawSubToolFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.StickerBottomSheetFragment
 import com.sgroupmobile.glowza.ui.photo_editor.fragment.TextSubToolFragment
 import com.sgroupmobile.glowza.util.FilterUtils
-import com.sgroupmobile.glowza.util.saveImageToGallery
 import com.yalantis.ucrop.UCrop
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -425,12 +421,15 @@ class EditorActivity : BaseActivity<ActivityEditorBinding>() {
     }
 
     private fun replaceSubToolFragment(fragment: Fragment) {
+        binding.subToolContainer.visibility = View.VISIBLE
 
         supportFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out
+            )
             .replace(R.id.sub_tool_container, fragment)
             .commitNowAllowingStateLoss()
-
-        binding.subToolContainer.visibility = View.VISIBLE
     }
     private fun showAdjustmentSubTool() = replaceSubToolFragment(AdjustmentSubToolFragment().apply {
         onAdjustmentChanged = { b, c, s ->
