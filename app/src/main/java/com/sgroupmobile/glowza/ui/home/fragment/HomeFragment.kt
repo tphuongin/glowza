@@ -12,6 +12,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.sgroupmobile.glowza.R
 import com.sgroupmobile.glowza.base.BaseFragment
 import com.sgroupmobile.glowza.common.enums.GalleryMode
+import com.sgroupmobile.glowza.common.enums.GalleryTab
 import com.sgroupmobile.glowza.data.model.FunctionItem
 import com.sgroupmobile.glowza.data.model.FunctionType
 import com.sgroupmobile.glowza.databinding.FragmentHomeBinding
@@ -103,6 +104,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 startActivity(
                     Intent(requireContext(), GalleryActivity::class.java).apply {
                         putExtra("mode", GalleryMode.MULTIPLE.name)
+                    }
+                )
+            }
+
+            FunctionType.IMAGES -> {
+                startActivity(
+                    Intent(requireContext(), GalleryActivity::class.java).apply {
+                        putExtra("mode", GalleryMode.SINGLE.name)
+                        putExtra("target_tab", GalleryTab.GLOWZA.name)
+                    }
+                )
+            }
+
+            FunctionType.VIDEOS -> {
+                startActivity(
+                    Intent(requireContext(), GalleryActivity::class.java).apply {
+                        putExtra("mode", GalleryMode.SINGLE.name)
+                        putExtra("target_tab", GalleryTab.VIDEO.name)
                     }
                 )
             }
