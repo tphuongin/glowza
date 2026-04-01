@@ -3,8 +3,7 @@
 Glowza is an Android application built with Kotlin, Jetpack libraries, CameraX, Hilt, and ML Kit face detection. The app appears to focus on camera, photo editing, collage creation, gallery browsing, and onboarding flows.
 
 ## Demo
-
-[▶ Watch Demo Video](https://drive.google.com/drive/folders/1rB_jynpGaiyz26SZ4R_8pHQSBa2DClAV)
+https://github.com/user-attachments/assets/055da708-e633-476e-9615-0ea4837a36b2
 
 ## Project structure
 
